@@ -1,4 +1,5 @@
 "use client";
+export const dynamic = "force-dynamic";
 import { useState, useEffect } from "react";
 import { Check } from "lucide-react";
 import { getSettings, saveSettings } from "@/lib/actions/misc";

@@ -1,4 +1,5 @@
 "use client";
+export const dynamic = "force-dynamic";
 import { useState, useEffect } from "react";
 import { Search, MessageCircle, X } from "lucide-react";
 import { getOrders, updateOrderStatus } from "@/lib/actions/orders";

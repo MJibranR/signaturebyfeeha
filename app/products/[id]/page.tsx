@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { getProductById, getProducts } from "@/lib/actions/products";
 import { notFound } from "next/navigation";
 import ProductDetailClient from "./ProductDetailClient";
