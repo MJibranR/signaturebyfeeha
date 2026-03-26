@@ -1,11 +1,85 @@
-import next from "next";
+"use client";
+import { useState, useEffect } from "react";
+import { getPageData } from "@/lib/actions/pages";
+
+type ReturnItem = {
+  id: number;
+  text: string;
+};
+
+type ReturnPolicyData = {
+  longevityHours: string;
+  returnDays: number;
+  noRefundText: string;
+  qualifyingConditions: ReturnItem[];
+  steps: ReturnItem[];
+  notes: ReturnItem[];
+};
+
+// Default return policy as fallback
+const DEFAULT_RETURN_POLICY: ReturnPolicyData = {
+  longevityHours: "15–18",
+  returnDays: 7,
+  noRefundText: "Due to the nature of perfume products, we are unable to offer refunds once an order has been shipped.",
+  qualifyingConditions: [
+    { id: 1, text: "The parcel arrives broken or damaged." },
+    { id: 2, text: "The products inside are damaged, leaking, or tampered." },
+    { id: 3, text: "The fragrance does not last the guaranteed 15-18 hours." },
+    { id: 4, text: "The wrong product was delivered." },
+  ],
+  steps: [
+    { id: 1, text: "Contact our Customer Service team within 48 hours of receiving your order. You can reach us via WhatsApp at +923353537028 or via the contact form on our website." },
+    { id: 2, text: "Please provide clear photos of the damage to the packaging and/or products." },
+    { id: 3, text: "Upon verification, we will arrange for a free replacement or exchange within 7 days." },
+  ],
+  notes: [
+    { id: 1, text: "We cannot replace products due to a change of mind or incorrect selection." },
+    { id: 2, text: "This policy applies only to damaged or defective goods received upon delivery." },
+    { id: 3, text: "Return window is strictly 7 days from the date of delivery." },
+    { id: 4, text: "All items must be unused, sealed, and in original packaging to qualify." },
+  ],
+};
 
 export default function ReturnPolicyPage() {
+  const [policy, setPolicy] = useState<ReturnPolicyData>(DEFAULT_RETURN_POLICY);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch return policy data from Neon DB on mount
+  useEffect(() => {
+    async function loadReturnPolicy() {
+      try {
+        const data = await getPageData("returns");
+        if (data) {
+          setPolicy(data as ReturnPolicyData);
+        }
+      } catch (error) {
+        console.error("Failed to load return policy:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadReturnPolicy();
+  }, []);
+
+  // Show loading state
+  if (loading) {
+    return (
+      <main className="min-h-screen py-16 px-4">
+        <div className="max-w-screen-md mx-auto">
+          <div className="text-center mb-12">
+            <div className="flex justify-center items-center gap-3">
+              <div className="w-6 h-6 border-2 border-[#C9A84C] border-t-transparent rounded-full animate-spin" />
+              <p className="text-sm" style={{ color: "#8B6914" }}>Loading Return Policy...</p>
+            </div>
+          </div>
+        </div>
+      </main>
+    );
+  }
+
   return (
     <>
-      <main
-        className="min-h-screen py-16 px-4"
-      >
+      <main className="min-h-screen py-16 px-4">
         <div className="max-w-screen-md mx-auto">
 
           {/* Heading */}
@@ -37,7 +111,7 @@ export default function ReturnPolicyPage() {
                   </svg>
                 ),
                 label: "Longevity Guaranteed",
-                value: "15–18 Hours Lasting",
+                value: `${policy.longevityHours} Hours Lasting`,
                 sub: "Every fragrance is tested and guaranteed to last.",
               },
               {
@@ -48,8 +122,8 @@ export default function ReturnPolicyPage() {
                   </svg>
                 ),
                 label: "Return Window",
-                value: "1 Week / 7 Days",
-                sub: "Return or exchange within 7 days of delivery.",
+                value: `${policy.returnDays} Day${policy.returnDays !== 1 ? 's' : ''}`,
+                sub: `Return or exchange within ${policy.returnDays} days of delivery.`,
               },
             ].map((item, i) => (
               <div
@@ -102,7 +176,7 @@ export default function ReturnPolicyPage() {
             <div className="h-px mb-5" style={{ background: "rgba(201,168,76,0.2)" }} />
 
             <p className="text-sm leading-relaxed mb-4" style={{ color: "#5a3e1a", fontFamily: "Georgia, serif" }}>
-              At Signature by Feeha, we guarantee the authenticity and longevity of all our fragrances. Every perfume is tested to last <span className="font-bold" style={{ color: "#8B6914" }}>15 to 18 hours</span> — and we stand behind that promise. Due to the nature of perfume products, <span className="font-bold" style={{ color: "#1a0a00" }}>we are unable to offer refunds</span> once an order has been shipped.
+              At Signature by Feeha, we guarantee the authenticity and longevity of all our fragrances. Every perfume is tested to last <span className="font-bold" style={{ color: "#8B6914" }}>{policy.longevityHours} hours</span> — and we stand behind that promise. <span className="font-bold" style={{ color: "#1a0a00" }}>{policy.noRefundText}</span>
             </p>
             <p className="text-sm leading-relaxed mb-5" style={{ color: "#5a3e1a", fontFamily: "Georgia, serif" }}>
               However, we understand that situations may arise during delivery. We will happily replace your order if:
@@ -110,20 +184,15 @@ export default function ReturnPolicyPage() {
 
             {/* Bullet conditions */}
             <ul className="flex flex-col gap-2 mb-6">
-              {[
-                "The parcel arrives broken or damaged.",
-                "The products inside are damaged, leaking, or tampered.",
-                "The fragrance does not last the guaranteed 15–18 hours.",
-                "The wrong product was delivered.",
-              ].map((item, i) => (
-                <li key={i} className="flex items-start gap-3">
+              {policy.qualifyingConditions.map((condition) => (
+                <li key={condition.id} className="flex items-start gap-3">
                   <span className="mt-1 flex-shrink-0 w-4 h-4 rounded-full flex items-center justify-center"
                     style={{ background: "rgba(201,168,76,0.15)", border: "1px solid rgba(201,168,76,0.4)" }}>
                     <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#C9A84C" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
                       <circle cx="12" cy="12" r="4" fill="#C9A84C" stroke="none"/>
                     </svg>
                   </span>
-                  <p className="text-sm" style={{ color: "#5a3e1a", fontFamily: "Georgia, serif" }}>{item}</p>
+                  <p className="text-sm" style={{ color: "#5a3e1a", fontFamily: "Georgia, serif" }}>{condition.text}</p>
                 </li>
               ))}
             </ul>
@@ -133,17 +202,13 @@ export default function ReturnPolicyPage() {
               To request a return or replacement:
             </p>
             <ol className="flex flex-col gap-3 mb-6">
-              {[
-                <>Contact our Customer Service team within <span className="font-bold" style={{ color: "#8B6914" }}>48 hours</span> of receiving your order. You can reach us via WhatsApp at <a href="https://wa.me/923324892489" className="underline hover:text-[#8B6914] transition-colors" style={{ textUnderlineOffset: "3px" }}>+923324892489</a> or via the contact form on our website.</>,
-                "Please provide clear photos of the damage to the packaging and/or products.",
-                "Upon verification, we will arrange for a free replacement or exchange within 7 days.",
-              ].map((step, i) => (
-                <li key={i} className="flex items-start gap-4">
+              {policy.steps.map((step, index) => (
+                <li key={step.id} className="flex items-start gap-4">
                   <span className="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-black mt-0.5"
                     style={{ background: "linear-gradient(135deg, #C9A84C, #8B6914)", color: "#1a0800" }}>
-                    {i + 1}
+                    {index + 1}
                   </span>
-                  <p className="text-sm leading-relaxed" style={{ color: "#5a3e1a", fontFamily: "Georgia, serif" }}>{step}</p>
+                  <p className="text-sm leading-relaxed" style={{ color: "#5a3e1a", fontFamily: "Georgia, serif" }}>{step.text}</p>
                 </li>
               ))}
             </ol>
@@ -155,15 +220,10 @@ export default function ReturnPolicyPage() {
             >
               <p className="text-xs font-black tracking-widest uppercase mb-2" style={{ color: "#8B6914" }}>Please note</p>
               <ul className="flex flex-col gap-1.5">
-                {[
-                  "We cannot replace products due to a change of mind or incorrect selection.",
-                  "This policy applies only to damaged or defective goods received upon delivery.",
-                  "Return window is strictly 7 days from the date of delivery.",
-                  "All items must be unused, sealed, and in original packaging to qualify.",
-                ].map((note, i) => (
-                  <li key={i} className="flex items-start gap-2">
+                {policy.notes.map((note) => (
+                  <li key={note.id} className="flex items-start gap-2">
                     <span className="text-[#C9A84C] mt-0.5 flex-shrink-0">•</span>
-                    <p className="text-xs leading-relaxed" style={{ color: "#5a3e1a" }}>{note}</p>
+                    <p className="text-xs leading-relaxed" style={{ color: "#5a3e1a" }}>{note.text}</p>
                   </li>
                 ))}
               </ul>

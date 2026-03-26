@@ -2,7 +2,7 @@
 import { useRef } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import Image from "next/image";
-import Logo from '@/images/Logo1-without-bg.png';
+import Logo from '../public/images/Logo1-without-bg.png';
 
 const services = [
   {

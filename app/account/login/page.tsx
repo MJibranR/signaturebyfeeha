@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { loginUser } from "@/lib/actions/auth";
 import Link from "next/link";
 import { Eye, EyeOff } from "lucide-react";
 
@@ -8,9 +9,19 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // handle login logic here
+  const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+
+  const res = await loginUser(email, password);
+
+  if (res?.error) {
+    alert(res.error);
+    return;
+  }
+
+  localStorage.setItem("user", JSON.stringify(res.user));
+
+  window.location.href = "/";
   };
 
   return (

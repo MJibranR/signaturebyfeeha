@@ -1,12 +1,12 @@
 "use client";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useCart } from "@/context/CartContext";
 import CartDrawer from "@/components/CartDrawer";
-import { usePathname } from "next/navigation";
-import { Search, User, ShoppingBag, ChevronDown, Menu, X } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { Search, User, ShoppingBag, Menu, X, LogOut, Package, ChevronDown } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-import Logo from '@/images/Logo1-without-bg.png';
+import Logo from '../public/images/Logo1-without-bg.png';
 
 const navLinks = [
   { label: "HOME", href: "/" },
@@ -18,11 +18,44 @@ const navLinks = [
 
 export default function Navbar() {
   const pathname = usePathname();
+  const router = useRouter();
   const { count } = useCart();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [accountOpen, setAccountOpen] = useState(false);
+  const [user, setUser] = useState<{ name?: string; email?: string } | null>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Load user from localStorage
+  useEffect(() => {
+    const stored = JSON.parse(localStorage.getItem("user") || "null");
+    setUser(stored);
+  }, []);
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setAccountOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    setUser(null);
+    setAccountOpen(false);
+    router.push("/");
+  };
+
+  const getInitials = (name?: string) => {
+    if (!name) return "U";
+    return name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2);
+  };
 
   const isActive = (href: string) =>
     href === "/" ? pathname === "/" : pathname.startsWith(href);
@@ -71,14 +104,14 @@ export default function Navbar() {
         </div>
       )}
 
-      {/* ── Cart Drawer (real component) ── */}
+      {/* ── Cart Drawer ── */}
       <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} />
 
       {/* ── Navbar ── */}
-      <header
-        className="border-b border-stone-200"
-        style={{ backgroundColor: "rgba(255,255,255,0.85)", backdropFilter: "blur(10px)" }}
-      >
+<header
+  className="border-b border-stone-200 sticky top-0 z-[40]"
+  style={{ backgroundColor: "rgba(255,255,255,0.85)", backdropFilter: "blur(10px)" }}
+>
         <div className="max-w-screen-xl mx-auto px-4 md:px-6 py-2.5 md:py-3 flex items-center justify-between">
           {/* Search */}
           <button
@@ -111,15 +144,112 @@ export default function Navbar() {
 
           {/* Icons */}
           <div className="flex items-center gap-3 md:gap-4 text-stone-600">
-            <Link
-              href="/account/login"
-              className="hover:text-[#8B6914] transition-colors hidden sm:block"
-              aria-label="Account"
-            >
-              <User size={20} />
-            </Link>
 
-            {/* Cart button with badge */}
+            {/* Account */}
+            <div className="relative hidden sm:block" ref={dropdownRef}>
+              {user ? (
+                // Logged-in: avatar circle + name + chevron
+                <button
+                  onClick={() => setAccountOpen(!accountOpen)}
+                  className="flex items-center gap-1.5 hover:text-[#8B6914] transition-colors"
+                  aria-label="Account menu"
+                >
+                  <div
+                    className="w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold tracking-wide select-none"
+                    style={{ background: "linear-gradient(135deg, #C9A84C, #8B6914)", color: "#fff" }}
+                  >
+                    {getInitials(user.name)}
+                  </div>
+                  <span
+                    className="hidden md:block text-[11px] font-semibold tracking-wide max-w-[80px] truncate"
+                    style={{ color: "#1a1a1a" }}
+                  >
+                    {user.name?.split(" ")[0]}
+                  </span>
+                  <ChevronDown
+                    size={13}
+                    className="transition-transform duration-200"
+                    style={{ transform: accountOpen ? "rotate(180deg)" : "rotate(0deg)", color: "#8B6914" }}
+                  />
+                </button>
+              ) : (
+                // Guest: plain user icon → goes to login
+                <Link href="/account/login" className="hover:text-[#8B6914] transition-colors" aria-label="Account">
+                  <User size={20} />
+                </Link>
+              )}
+
+              {/* Dropdown */}
+              {accountOpen && user && (
+                <div
+                  className="absolute right-0 mt-2.5 w-56 rounded-xl shadow-xl overflow-hidden z-50"
+                  style={{ border: "1px solid #e7e0d6", background: "#fff" }}
+                >
+                  {/* User info header */}
+                  <div className="px-4 py-3.5" style={{ background: "linear-gradient(135deg, rgba(201,168,76,0.08), rgba(139,105,20,0.04))", borderBottom: "1px solid #ede8e0" }}>
+                    <div className="flex items-center gap-3">
+                      <div
+                        className="w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
+                        style={{ background: "linear-gradient(135deg, #C9A84C, #8B6914)", color: "#fff" }}
+                      >
+                        {getInitials(user.name)}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-[12px] font-semibold truncate" style={{ color: "#1a1a1a", letterSpacing: "0.02em" }}>
+                          {user.name || "Guest"}
+                        </p>
+                        <p className="text-[10px] truncate" style={{ color: "#888", letterSpacing: "0.02em" }}>
+                          {user.email || ""}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Menu items */}
+                  <div className="py-1">
+                    <Link
+                      href="/account/orders"
+                      onClick={() => setAccountOpen(false)}
+                      className="flex items-center gap-3 px-4 py-2.5 text-[11px] font-semibold tracking-wide transition-colors group"
+                      style={{ color: "#4b5563", letterSpacing: "0.06em" }}
+                      onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "rgba(201,168,76,0.07)")}
+                      onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "")}
+                    >
+                      <Package size={14} style={{ color: "#8B6914" }} />
+                      MY ORDERS
+                    </Link>
+
+                    <Link
+                      href="/account/profile"
+                      onClick={() => setAccountOpen(false)}
+                      className="flex items-center gap-3 px-4 py-2.5 text-[11px] font-semibold tracking-wide transition-colors"
+                      style={{ color: "#4b5563", letterSpacing: "0.06em" }}
+                      onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "rgba(201,168,76,0.07)")}
+                      onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "")}
+                    >
+                      <User size={14} style={{ color: "#8B6914" }} />
+                      MY PROFILE
+                    </Link>
+                  </div>
+
+                  {/* Divider + Logout */}
+                  <div style={{ borderTop: "1px solid #ede8e0" }} className="py-1">
+                    <button
+                      onClick={handleLogout}
+                      className="w-full flex items-center gap-3 px-4 py-2.5 text-[11px] font-semibold tracking-wide transition-colors"
+                      style={{ color: "#b45309", letterSpacing: "0.06em" }}
+                      onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "rgba(180,83,9,0.06)")}
+                      onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "")}
+                    >
+                      <LogOut size={14} />
+                      LOGOUT
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Cart */}
             <button
               onClick={() => setCartOpen(true)}
               className="hover:text-[#8B6914] transition-colors relative"
@@ -136,13 +266,14 @@ export default function Navbar() {
               )}
             </button>
 
+            {/* Mobile hamburger */}
             <button className="sm:hidden" onClick={() => setMobileOpen(!mobileOpen)}>
               {mobileOpen ? <X size={20} /> : <Menu size={20} />}
             </button>
           </div>
         </div>
 
-        {/* Desktop nav — all links in one unified row that wraps cleanly */}
+        {/* Desktop nav */}
         <nav className="hidden sm:block border-t border-stone-200">
           <div className="max-w-screen-xl mx-auto px-4">
             <ul className="flex items-center justify-center flex-wrap">
@@ -200,6 +331,58 @@ export default function Navbar() {
                 </Link>
               );
             })}
+
+            {/* Mobile account section */}
+            {user ? (
+              <>
+                <div className="px-5 py-3 border-b border-stone-100" style={{ background: "rgba(201,168,76,0.04)" }}>
+                  <div className="flex items-center gap-3">
+                    <div
+                      className="w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-bold"
+                      style={{ background: "linear-gradient(135deg, #C9A84C, #8B6914)", color: "#fff" }}
+                    >
+                      {getInitials(user.name)}
+                    </div>
+                    <div>
+                      <p className="text-[11px] font-semibold" style={{ color: "#1a1a1a" }}>{user.name}</p>
+                      <p className="text-[10px]" style={{ color: "#888" }}>{user.email}</p>
+                    </div>
+                  </div>
+                </div>
+                <Link
+                  href="/account/orders"
+                  className="flex items-center gap-3 px-5 py-3 text-[11px] font-semibold tracking-widest border-b border-stone-100"
+                  style={{ color: "#4b5563", borderLeft: "3px solid transparent" }}
+                  onClick={() => setMobileOpen(false)}
+                >
+                  <Package size={14} style={{ color: "#8B6914" }} /> MY ORDERS
+                </Link>
+                <Link
+                  href="/account/profile"
+                  className="flex items-center gap-3 px-5 py-3 text-[11px] font-semibold tracking-widest border-b border-stone-100"
+                  style={{ color: "#4b5563", borderLeft: "3px solid transparent" }}
+                  onClick={() => setMobileOpen(false)}
+                >
+                  <User size={14} style={{ color: "#8B6914" }} /> MY PROFILE
+                </Link>
+                <button
+                  onClick={() => { handleLogout(); setMobileOpen(false); }}
+                  className="w-full flex items-center gap-3 px-5 py-3 text-[11px] font-semibold tracking-widest border-b border-stone-100"
+                  style={{ color: "#b45309", borderLeft: "3px solid transparent" }}
+                >
+                  <LogOut size={14} /> LOGOUT
+                </button>
+              </>
+            ) : (
+              <Link
+                href="/account/login"
+                className="flex items-center gap-3 px-5 py-3 text-[11px] font-semibold tracking-widest border-b border-stone-100"
+                style={{ color: "#4b5563", borderLeft: "3px solid transparent" }}
+                onClick={() => setMobileOpen(false)}
+              >
+                <User size={14} style={{ color: "#8B6914" }} /> LOGIN / REGISTER
+              </Link>
+            )}
           </div>
         )}
       </header>

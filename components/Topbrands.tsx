@@ -1,13 +1,12 @@
-import { getBrands } from "@/lib/actions/misc";
+// components/Topbrands.tsx
 import Link from "next/link";
+import { Brand } from "@/lib/actions/homepage";
 
-export default async function Topbrands() {
-  let brands: any[] = [];
-  try {
-    brands = await getBrands();
-  } catch {
-    return null;
-  }
+interface TopbrandsProps {
+  brands: Brand[];
+}
+
+export default function Topbrands({ brands }: TopbrandsProps) {
   if (!brands.length) return null;
 
   const doubled = [...brands, ...brands];

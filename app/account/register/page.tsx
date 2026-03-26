@@ -1,4 +1,5 @@
 "use client";
+import { registerUser } from "@/lib/actions/auth";
 import { useState } from "react";
 import Link from "next/link";
 import { Eye, EyeOff } from "lucide-react";
@@ -7,10 +8,19 @@ export default function RegisterPage() {
   const [form, setForm] = useState({ firstName: "", lastName: "", email: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // handle register logic here
-  };
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+
+  const res = await registerUser(form);
+
+  if (res?.error) {
+    alert(res.error);
+    return;
+  }
+
+  alert("Account created!");
+  window.location.href = "/account/login";
+};
 
   const inputStyle = {
     background: "rgba(255,255,255,0.9)",

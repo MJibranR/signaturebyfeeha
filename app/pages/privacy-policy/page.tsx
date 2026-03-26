@@ -1,42 +1,92 @@
-import React from "react";
+"use client";
+import React, { useState, useEffect } from "react";
+import { getPageData } from "@/lib/actions/pages";
 
-const sections = [
+type Section = {
+  id: number;
+  title: string;
+  body: string;
+};
+
+// Default sections as fallback
+const DEFAULT_SECTIONS: Section[] = [
   {
+    id: 1,
     title: "Log Files",
     body: "Signature by Feeha follows a standard procedure of using log files. These files log visitors when they visit websites. All hosting companies do this as part of hosting services' analytics. The information collected by log files includes internet protocol (IP) addresses, browser type, Internet Service Provider (ISP), date and time stamp, referring/exit pages, and possibly the number of clicks. These are not linked to any personally identifiable information. The purpose of the information is for analyzing trends, administering the site, tracking users' movement on the website, and gathering demographic information.",
   },
   {
+    id: 2,
     title: "Cookies and Web Beacons",
     body: "Like any other website, Signature by Feeha uses cookies. These cookies are used to store information including visitors' preferences and the pages on the website that the visitor accessed or visited. The information is used to optimize the users' experience by customizing our web page content based on visitors' browser type and/or other information.",
   },
   {
+    id: 3,
     title: "Our Advertising Partners",
     body: "Some of the advertisers on our site may use cookies and web beacons. Our advertising partners include Google and Meta (Facebook), each of whom has their own Privacy Policy governing their use of user data. Third-party ad servers or ad networks use technologies like cookies, JavaScript, or web beacons in their advertisements and links that appear on Signature by Feeha, which are sent directly to users' browsers. They automatically receive your IP address when this occurs. These technologies are used to measure the effectiveness of advertising campaigns and/or to personalize the advertising content you see on websites you visit. Note that Signature by Feeha has no access to or control over cookies used by third-party advertisers.",
   },
   {
+    id: 4,
     title: "Third-Party Privacy Policies",
     body: "Signature by Feeha's Privacy Policy does not apply to other advertisers or websites. We advise you to consult the respective Privacy Policies of these third-party ad servers for more detailed information. It may include their practices and instructions about how to opt-out of certain options. You can choose to disable cookies through your individual browser options. To find more detailed information about cookie management with specific web browsers, it can be found at the browsers' respective websites.",
   },
   {
+    id: 5,
     title: "Children's Information",
     body: "Another part of our priority is adding protection for children while using the internet. We encourage parents and guardians to observe, participate in, and/or monitor and guide their online activity. Signature by Feeha does not knowingly collect any Personally Identifiable Information from children under the age of 13. If you think that your child provided this kind of information on our website, we strongly encourage you to contact us immediately and we will do our best to promptly remove such information from our records.",
   },
   {
+    id: 6,
     title: "Online Privacy Policy Only",
     body: "This Privacy Policy applies only to our online activities and is valid for visitors to our website with regards to the information that they shared and/or collected on Signature by Feeha. This policy is not applicable to any information collected offline or via channels other than this website.",
   },
   {
+    id: 7,
     title: "Consent",
     body: "By using our website, you hereby consent to our Privacy Policy and agree to its Terms and Conditions.",
   },
 ];
 
 export default function PrivacyPolicyPage() {
+  const [sections, setSections] = useState<Section[]>(DEFAULT_SECTIONS);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch privacy policy data from Neon DB on mount
+  useEffect(() => {
+    async function loadPrivacyPolicy() {
+      try {
+        const data = await getPageData("privacy");
+        if (data && Array.isArray(data) && data.length > 0) {
+          setSections(data as Section[]);
+        }
+      } catch (error) {
+        console.error("Failed to load privacy policy:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadPrivacyPolicy();
+  }, []);
+
+  // Show loading state
+  if (loading) {
+    return (
+      <main className="min-h-screen py-16 px-4">
+        <div className="max-w-screen-md mx-auto">
+          <div className="text-center mb-12">
+            <div className="flex justify-center items-center gap-3">
+              <div className="w-6 h-6 border-2 border-[#C9A84C] border-t-transparent rounded-full animate-spin" />
+              <p className="text-sm" style={{ color: "#8B6914" }}>Loading Privacy Policy...</p>
+            </div>
+          </div>
+        </div>
+      </main>
+    );
+  }
+
   return (
     <>
-      <main
-        className="min-h-screen py-16 px-4"
-      >
+      <main className="min-h-screen py-16 px-4">
         <div className="max-w-screen-md mx-auto">
 
           {/* Heading */}
@@ -79,7 +129,7 @@ export default function PrivacyPolicyPage() {
           <div className="flex flex-col gap-4">
             {sections.map((section, i) => (
               <div
-                key={i}
+                key={section.id}
                 className="rounded-2xl px-8 py-6"
                 style={{
                   background: "rgba(255,255,255,0.75)",

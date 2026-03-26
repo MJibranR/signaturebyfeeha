@@ -1,36 +1,53 @@
 "use client";
-import { useState } from "react";
+export const dynamic = "force-dynamic";
+import { useState, useEffect } from "react";
+import { getPageData } from "@/lib/actions/pages";
 
-const faqs = [
+type FAQ = {
+  id: number;
+  q: string;
+  a: string;
+};
+
+// Default FAQs as fallback
+const DEFAULT_FAQS: FAQ[] = [
   {
+    id: 1,
     q: "Do you have original perfumes for men and women?",
     a: "Yes, we are one of the biggest importers and wholesalers of 100% authentic perfumes in Pakistan, supplying original branded perfumes to multiple retail stores across different cities. Signature by Feeha entered the e-commerce industry to bring these authentic scents directly to your doorstep.",
   },
   {
+    id: 2,
     q: "Do you suggest luxury perfumes to customers?",
     a: "Yes, we offer complimentary perfume consultation to our clients and help you select your signature scent. Our specialists guide you based on your preferences, personality, and occasion — so every fragrance feels made for you.",
   },
   {
+    id: 3,
     q: "What is the delivery time?",
     a: "Delivery time is max 7–10 working days. Most orders are processed within 2 days. In some cases orders may be delayed, but never beyond 10 working days. We always keep you updated via WhatsApp.",
   },
   {
+    id: 4,
     q: "How do I place an order?",
     a: "Placing an order is very simple. Our website is designed to make order processing smooth and intuitive. You can create an account or check out as a guest. You can also place an order by calling us or leaving a message on WhatsApp at +923353537028.",
   },
   {
+    id: 5,
     q: "What payment options are available?",
     a: "We encourage online bank transfers or direct deposits. We also offer Cash on Delivery (COD) for your convenience.",
   },
   {
+    id: 6,
     q: "How do I track my order?",
     a: "Once your order is dispatched, the tracking number will be sent to you via WhatsApp. You can use it to track your delivery in real time.",
   },
   {
+    id: 7,
     q: "What is your return & exchange policy?",
     a: "We offer hassle-free returns and exchanges within 7 days of delivery, provided the product is unused and in its original packaging. Please contact us via WhatsApp or email to initiate a return.",
   },
   {
+    id: 8,
     q: "Are all your products sealed and original?",
     a: "Absolutely. Every product at Signature by Feeha is 100% original, sealed, and sourced directly from authorized distributors. We take authenticity very seriously — your trust is our priority.",
   },
@@ -38,14 +55,47 @@ const faqs = [
 
 export default function FAQsPage() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
+  const [faqs, setFaqs] = useState<FAQ[]>(DEFAULT_FAQS);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch FAQs from Neon DB on mount
+  useEffect(() => {
+    async function loadFaqs() {
+      try {
+        const data = await getPageData("faqs");
+        if (data && Array.isArray(data) && data.length > 0) {
+          setFaqs(data as FAQ[]);
+        }
+      } catch (error) {
+        console.error("Failed to load FAQs:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadFaqs();
+  }, []);
 
   const toggle = (i: number) => setOpenIndex(openIndex === i ? null : i);
 
+  // Show loading state
+  if (loading) {
+    return (
+      <main className="min-h-screen py-16 px-4">
+        <div className="max-w-screen-md mx-auto">
+          <div className="text-center mb-12">
+            <div className="flex justify-center items-center gap-3">
+              <div className="w-6 h-6 border-2 border-[#C9A84C] border-t-transparent rounded-full animate-spin" />
+              <p className="text-sm" style={{ color: "#8B6914" }}>Loading FAQs...</p>
+            </div>
+          </div>
+        </div>
+      </main>
+    );
+  }
+
   return (
     <>
-      <main
-        className="min-h-screen py-16 px-4"
-      >
+      <main className="min-h-screen py-16 px-4">
         <div className="max-w-screen-md mx-auto">
 
           {/* Heading */}
@@ -70,7 +120,7 @@ export default function FAQsPage() {
           <div className="flex flex-col gap-3">
             {faqs.map((faq, i) => (
               <div
-                key={i}
+                key={faq.id}
                 className="rounded-2xl overflow-hidden transition-all duration-300"
                 style={{
                   background: "rgba(255,255,255,0.78)",

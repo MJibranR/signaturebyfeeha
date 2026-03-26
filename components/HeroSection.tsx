@@ -1,36 +1,76 @@
+// components/HeroSection.tsx
 import Image from "next/image";
-import Hero from '@/images/hero.png'
+import Hero from '../public/images/hero.png';
 
-export default function HeroSection() {
+interface HeroSectionProps {
+  heroImage?: string;
+  heroVideo?: string;
+  heroType?: 'image' | 'video';
+}
+
+export default function HeroSection({ heroImage, heroVideo, heroType = 'image' }: HeroSectionProps) {
+  // If video hero is provided and enabled
+  if (heroType === 'video' && heroVideo) {
+    return (
+      <section 
+        className="w-full relative"
+        style={{ backgroundColor: "transparent", position: "relative" }}
+      >
+        <div className="max-w-screen-xl mx-auto px-0 md:px-6 py-6">
+          <div className="relative w-full overflow-hidden rounded-none md:rounded-lg">
+            <video
+              src={heroVideo}
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="w-full h-auto object-cover"
+            />
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  // If custom image hero is provided from DB
+  if (heroImage) {
+    return (
+      <section 
+        className="w-full relative"
+        style={{ backgroundColor: "transparent", position: "relative" }}
+      >
+        <div className="max-w-screen-xl mx-auto px-0 md:px-6 py-6">
+          <div className="relative w-full overflow-hidden rounded-none md:rounded-lg">
+            {heroImage.startsWith('data:') || heroImage.startsWith('http') ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={heroImage}
+                alt="Signature by Feeha hero banner"
+                className="w-full h-auto object-cover"
+              />
+            ) : (
+              <Image
+                src={heroImage}
+                alt="Signature by Feeha hero banner"
+                width={1200}
+                height={700}
+                className="w-full h-auto object-cover"
+                priority
+              />
+            )}
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  // Default hero
   return (
-    <section style={{ backgroundColor: "transparent" }} className="py-6 px-0 md:px-6">
-      <div className="max-w-screen-xl mx-auto">
-
-        {/* ── Headline ── */}
-        {/* <div className="text-center mb-5">
-          <h1
-            style={{
-              fontFamily: "Georgia, 'Times New Roman', serif",
-              lineHeight: 1.2,
-            }}
-            className="text-3xl md:text-5xl font-bold"
-          >
-            <span style={{ color: "#8B6914", fontStyle: "italic", fontWeight: 300 }}>
-              Elevate{" "}
-            </span>
-            <span style={{ color: "#8B6914", fontStyle: "italic", fontWeight: 900 }}>
-              Y
-            </span>
-            <span style={{ color: "#8B6914", fontStyle: "italic", fontWeight: 300 }}>
-              our Scent,
-            </span>
-            <span className="block md:inline" style={{ color: "#1a1a1a" }}>
-              {" "}Delivery Included Nationwide
-            </span>
-          </h1>
-        </div> */}
-
-        {/* ── Hero Image (6-in-1 composite) ── */}
+    <section 
+      className="w-full relative"
+      style={{ backgroundColor: "transparent", position: "relative" }}
+    >
+      <div className="max-w-screen-xl mx-auto px-0 md:px-6 py-6">
         <div className="relative w-full overflow-hidden rounded-none md:rounded-lg">
           <Image
             src={Hero}
@@ -41,7 +81,6 @@ export default function HeroSection() {
             priority
           />
         </div>
-
       </div>
     </section>
   );

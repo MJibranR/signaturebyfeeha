@@ -45,7 +45,7 @@ const FIELDS = [
   { key: "baseNotes",   label: "Base Notes",              type: "text",   required: true },
 ];
 
-const CATEGORIES = ["men", "women", "unisex", "niche", "gift-sets", "body-mists", "middle-eastern"];
+const CATEGORIES = ["men", "women", "unisex",];
 
 const statusStyle: Record<string, { bg: string; color: string }> = {
   true:  { bg: "rgba(45,138,78,0.12)",  color: "#2d8a4e" },

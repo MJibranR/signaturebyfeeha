@@ -1,55 +1,22 @@
+// components/Featuredproductsection.tsx
 "use client";
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ShoppingBag } from "lucide-react";
-import oud from '../public/images/perfume/oud.png';
-import Gucci_Ruches from '../public/images/perfume/gucci-ruch.png';
-import Creed_Aventus from '../public/images/perfume/creed-aventus.png';
+import { FeaturedSet } from "@/lib/actions/homepage";
 
-const featured = [
-  {
-    id: 1,
-    name: "Oud Wood",
-    brand: "Tom Ford",
-    tagline: "Pour Homme · Woody Oriental",
-    image: oud,
-    video: "/video/perfume/oud.mp4",
-    href: "/products/island-dreams",
-    imageLeft: true,
-    bg: "linear-gradient(135deg, #1a0800 0%, #2d1200 100%)",
-  },
-  {
-    id: 2,
-    name: "Gucci Ruches",
-    brand: "Gucci",
-    tagline: "Pour Femme · Floral Chypre",
-    image: Gucci_Ruches,
-    video: "/video/perfume/Gucci-Ruches.mp4",
-    href: "/products/rayhaan-valhalla",
-    imageLeft: false,
-    bg: "linear-gradient(135deg, #2d0000 0%, #4a0a0a 100%)",
-  },
-  {
-    id: 3,
-    name: "Creed Aventus",
-    brand: "Creed",
-    tagline: "Pour Homme · Fruity Chypre",
-    image: Creed_Aventus,
-    video: "/video/perfume/Drift-Aura.mp4",
-    href: "/products/vanilla-vibes",
-    imageLeft: true,
-    bg: "linear-gradient(135deg, #0a1528 0%, #1a2a4a 100%)",
-  },
-];
+interface FeaturedProductSectionProps {
+  featuredSets: FeaturedSet[];
+}
 
-const TOTAL = featured.length;
-
-export default function FeaturedProductSection() {
+export default function FeaturedProductSection({ featuredSets }: FeaturedProductSectionProps) {
   const [current, setCurrent] = useState(0);
   const [isMuted, setIsMuted] = useState(true);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
+  
+  const TOTAL = featuredSets.length;
 
   // Scroll → slide index
   useEffect(() => {
@@ -65,7 +32,7 @@ export default function FeaturedProductSection() {
     };
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+  }, [TOTAL]);
 
   // Sync mute state to all videos whenever it changes
   useEffect(() => {
@@ -83,6 +50,8 @@ export default function FeaturedProductSection() {
 
   const toggleMute = () => setIsMuted((m) => !m);
 
+  if (!featuredSets.length) return null;
+
   return (
     <div ref={wrapperRef} style={{ height: `${TOTAL * 100}vh`, position: "relative" }}>
       <div style={{ position: "sticky", top: 0, height: "100vh", overflow: "hidden" }}>
@@ -96,7 +65,7 @@ export default function FeaturedProductSection() {
             transition: "transform 0.75s cubic-bezier(0.77,0,0.175,1)",
           }}
         >
-          {featured.map((item, i) => (
+          {featuredSets.map((item, i) => (
             <div
               key={item.id}
               className="relative flex flex-col md:flex-row h-full"
@@ -104,7 +73,9 @@ export default function FeaturedProductSection() {
             >
               {/* IMAGE */}
               <div className={`relative flex-1 ${item.imageLeft ? "md:order-1" : "md:order-2"} order-1`}>
-                <Image src={item.image} alt={item.name} fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" priority />
+                {item.imagePreview && (
+                  <img src={item.imagePreview} alt={item.name} className="w-full h-full object-cover" />
+                )}
                 <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.05) 55%, transparent 100%)" }} />
                 <div className="absolute inset-0" style={{ boxShadow: "inset 0 0 0 1px rgba(201,168,76,0.2)" }} />
                 <div className="absolute bottom-6 left-5 right-5 md:bottom-10 md:left-8 md:right-8">
@@ -128,7 +99,7 @@ export default function FeaturedProductSection() {
               <div className={`relative flex-1 hidden md:block ${item.imageLeft ? "md:order-2" : "md:order-1"}`}>
                 <video
                   ref={(el) => { videoRefs.current[i] = el; }}
-                  src={item.video}
+                  src={item.videoPath}
                   muted
                   loop
                   playsInline
@@ -167,7 +138,7 @@ export default function FeaturedProductSection() {
 
         {/* Dots */}
         <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-3 z-20">
-          {featured.map((_, i) => (
+          {featuredSets.map((_, i) => (
             <div key={i} style={{ width: i === current ? "28px" : "8px", height: "8px", borderRadius: "4px", background: i === current ? "#C9A84C" : "rgba(201,168,76,0.35)", transition: "all 0.3s" }} />
           ))}
         </div>

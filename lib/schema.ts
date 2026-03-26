@@ -27,6 +27,7 @@ export const orders = pgTable("orders", {
   id:        text("id").primaryKey(),
   customer:  text("customer").notNull(),
   phone:     text("phone").notNull(),
+  email:     text("email").notNull().default(""),   // ← ADD THIS
   product:   text("product").notNull(),
   qty:       integer("qty").notNull().default(1),
   amount:    integer("amount").notNull(),
@@ -76,4 +77,43 @@ export const brands = pgTable("brands", {
   name:  text("name").notNull(),
   image: text("image").notNull().default(""),
   href:  text("href").notNull().default(""),
+});
+
+// ─── Users ────────────────────────────────────────────────────────────────
+export const users = pgTable("users", {
+  id:        serial("id").primaryKey(),
+  firstName: text("first_name").notNull(),
+  lastName:  text("last_name").notNull(),
+  email:     text("email").notNull().unique(),
+  password:  text("password").notNull(),
+  phone:     text("phone").notNull().default(""),
+  created_at: timestamp("created_at").defaultNow(),  // ← match exactly
+});
+
+// ─── Contact Messages ─────────────────────────────────────────────────────────
+export const contactMessages = pgTable("contact_messages", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  email: text("email").notNull(),
+  message: text("message").notNull(),
+  reply: text("reply").default(""),
+  repliedAt: timestamp("replied_at"),
+  status: text("status").notNull().default("pending"), // pending, replied
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// ─── Homepage Settings ─────────────────────────────────────────────────────────
+export const homepageSettings = pgTable("homepage_settings", {
+  key: text("key").primaryKey(), // "main"
+  config: jsonb("config").notNull(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// ─── Password Reset Tokens ─────────────────────────────────────────────────────────
+export const passwordResetTokens = pgTable("password_reset_tokens", {
+  id: serial("id").primaryKey(),
+  email: text("email").notNull(),
+  token: text("token").notNull().unique(),
+  expiresAt: timestamp("expires_at").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
 });

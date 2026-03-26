@@ -1,15 +1,14 @@
-import creedAventus from '../public/images/perfume/creed-aventus.png';
-import driftAura from '../public/images/perfume/drift-aura.png';
-import gucciRuch from '../public/images/perfume/gucci-ruch.png';
-import oud from '../public/images/perfume/oud.png';
-import { StaticImageData } from 'next/image';
+// lib/products.ts
+import { db } from "@/lib/db";
+import { products as productsTable } from "@/lib/schema";
+import { desc, eq } from "drizzle-orm";
 
 export type Product = {
   id: string;
   name: string;
   brand: string;
   price: number;
-  image: string | StaticImageData;
+  image: string;
   rating: number;
   reviews: number;
   size: string;
@@ -20,145 +19,127 @@ export type Product = {
   inStock: boolean;
   stockCount: number;
   shippingFee: number;
+  createdAt: Date | null;
 };
 
-export const products: Product[] = [
-  {
-    id: "afnan-9pm-elixir",
-    name: "Afnan 9PM Elixir 100ML EDP",
-    brand: "Afnan", price: 12000,
-    image: "https://images.unsplash.com/photo-1594035910387-fea47794261f?w=400&q=80",
-    rating: 5, reviews: 0, size: "100ML",
-    topNotes: "Cardamom, Nutmeg, and Ilemi",
-    heartNotes: "Pimento, Leather, and Lavender",
-    baseNotes: "Vanilla, Patchouli, Labdanum, and Rock rose",
-    category: "men", inStock: true, stockCount: 4, shippingFee: 0,
-  },
-  {
-    id: "afnan-9pm-rebel",
-    name: "Afnan 9PM Rebel 100ML EDP",
-    brand: "Afnan", price: 11000,
-    image: creedAventus,
-    rating: 5, reviews: 2, size: "100ML",
-    topNotes: "Bergamot, Grapefruit",
-    heartNotes: "Rose, Jasmine",
-    baseNotes: "Musk, Amber, Sandalwood",
-    category: "men", inStock: true, stockCount: 8, shippingFee: 0,
-  },
-  {
-    id: "afnan-supremacy-collector",
-    name: "Afnan Supremacy Collector's Edition 100ML EDP",
-    brand: "Afnan", price: 10500,
-    image: oud,
-    rating: 5, reviews: 2, size: "100ML",
-    topNotes: "Bergamot, Lemon",
-    heartNotes: "Rose, Oud",
-    baseNotes: "Musk, Amber",
-    category: "unisex", inStock: true, stockCount: 6, shippingFee: 0,
-  },
-  {
-    id: "afnan-supremacy-intense",
-    name: "Afnan Supremacy Not Only Intense Men 100ML Extrait",
-    brand: "Afnan", price: 10000,
-    image: driftAura,
-    rating: 5, reviews: 0, size: "100ML",
-    topNotes: "Spices, Pepper",
-    heartNotes: "Leather, Tobacco",
-    baseNotes: "Oud, Sandalwood, Musk",
-    category: "men", inStock: true, stockCount: 3, shippingFee: 0,
-  },
-  {
-    id: "ahmed-hayana",
-    name: "Ahmed Al Maghribi Hayana EDP 100ML",
-    brand: "Ahmed Al Maghribi", price: 7300,
-    image: gucciRuch,
-    rating: 5, reviews: 0, size: "100ML",
-    topNotes: "Citrus, Bergamot",
-    heartNotes: "Rose, Jasmine",
-    baseNotes: "Musk, Amber",
-    category: "women", inStock: true, stockCount: 10, shippingFee: 0,
-  },
-  {
-    id: "ahmed-joud",
-    name: "Ahmed Al Maghribi Joud EDP 100ML",
-    brand: "Ahmed Al Maghribi", price: 7300,
-    image: oud,
-    rating: 5, reviews: 0, size: "100ML",
-    topNotes: "Oud, Saffron",
-    heartNotes: "Rose, Patchouli",
-    baseNotes: "Amber, Musk",
-    category: "unisex", inStock: true, stockCount: 5, shippingFee: 0,
-  },
-  {
-    id: "ahmed-laathani",
-    name: "Ahmed Al Maghribi Laathani EDP 80ML",
-    brand: "Ahmed Al Maghribi", price: 15550,
-    image: creedAventus,
-    rating: 5, reviews: 0, size: "80ML",
-    topNotes: "Saffron, Oud",
-    heartNotes: "Rose, Amber",
-    baseNotes: "Sandalwood, Musk",
-    category: "unisex", inStock: true, stockCount: 2, shippingFee: 0,
-  },
-  {
-    id: "ahmed-marj",
-    name: "Ahmed Al Maghribi Marj EDP 60ML",
-    brand: "Ahmed Al Maghribi", price: 16400,
-    image: "https://images.unsplash.com/photo-1619994403073-2cec844b8e63?w=400&q=80",
-    rating: 5, reviews: 0, size: "60ML",
-    topNotes: "Floral, Citrus",
-    heartNotes: "Iris, Jasmine",
-    baseNotes: "Musk, Cedarwood",
-    category: "women", inStock: true, stockCount: 4, shippingFee: 0,
-  },
-  {
-    id: "lattafa-angham",
-    name: "Lattafa Angham EDP 100ML",
-    brand: "Lattafa", price: 7330,
-    image: driftAura,
-    rating: 5, reviews: 6, size: "100ML",
-    topNotes: "Saffron, Bergamot",
-    heartNotes: "Rose, Oud",
-    baseNotes: "Amber, Musk, Sandalwood",
-    category: "unisex", inStock: true, stockCount: 12, shippingFee: 0,
-  },
-  {
-    id: "lattafa-mayar",
-    name: "Lattafa Mayar Cherry Intense 100ML",
-    brand: "Lattafa", price: 5580,
-    image: gucciRuch,
-    rating: 5, reviews: 2, size: "100ML",
-    topNotes: "Cherry, Bergamot",
-    heartNotes: "Rose, Jasmine",
-    baseNotes: "Vanilla, Musk",
-    category: "women", inStock: true, stockCount: 9, shippingFee: 0,
-  },
-  {
-    id: "dior-sauvage",
-    name: "Dior Sauvage Elixir 60ML",
-    brand: "Dior", price: 19800,
-    image: "https://images.unsplash.com/photo-1594035910387-fea47794261f?w=400&q=80",
-    rating: 5, reviews: 5, size: "60ML",
-    topNotes: "Grapefruit, Pepper",
-    heartNotes: "Lavender, Geranium",
-    baseNotes: "Ambroxan, Cedarwood",
-    category: "men", inStock: true, stockCount: 3, shippingFee: 0,
-  },
-  {
-    id: "creed-aventus",
-    name: "Creed Aventus 100ML EDP",
-    brand: "Creed", price: 45000,
-    image: creedAventus,
-    rating: 5, reviews: 8, size: "100ML",
-    topNotes: "Pineapple, Bergamot, Apple",
-    heartNotes: "Rose, Jasmine, Patchouli",
-    baseNotes: "Musk, Oakmoss, Ambergris",
-    category: "men", inStock: true, stockCount: 2, shippingFee: 0,
-  },
-];
+// Cache for products to avoid repeated DB calls
+let productsCache: Product[] | null = null;
+let lastFetchTime = 0;
+const CACHE_DURATION = 60000; // 1 minute cache
 
-export const getProductById = (id: string): Product | undefined =>
-  products.find((p) => p.id === id);
+// Helper to ensure we're on the server
+function ensureServerOnly() {
+  if (typeof window !== 'undefined') {
+    throw new Error('Database operations can only be performed on the server');
+  }
+}
 
-export const getRelatedProducts = (id: string, limit = 4): Product[] =>
-  products.filter((p) => p.id !== id).slice(0, limit);
+// Fetch all products from Neon DB
+export async function getAllProducts(): Promise<Product[]> {
+  ensureServerOnly();
+  
+  const now = Date.now();
+  
+  // Return cached products if cache is fresh
+  if (productsCache && (now - lastFetchTime) < CACHE_DURATION) {
+    return productsCache;
+  }
+  
+  try {
+    const allProducts = await db.select().from(productsTable);
+    productsCache = allProducts as Product[];
+    lastFetchTime = now;
+    return productsCache;
+  } catch (error) {
+    console.error("Failed to fetch products:", error);
+    return [];
+  }
+}
+
+// Get products by IDs
+export async function getProductsByIds(ids: string[]): Promise<Product[]> {
+  ensureServerOnly();
+  
+  if (!ids.length) return [];
+  
+  try {
+    const allProducts = await getAllProducts();
+    return allProducts.filter(p => ids.includes(p.id));
+  } catch (error) {
+    console.error("Failed to fetch products by IDs:", error);
+    return [];
+  }
+}
+
+// Get trending products (by highest reviews)
+export async function getTrendingProducts(limit: number = 8) {
+  ensureServerOnly();
+  
+  try {
+    const trending = await db
+      .select()
+      .from(productsTable)
+      .orderBy(desc(productsTable.reviews))
+      .limit(limit);
+    return trending as Product[];
+  } catch (error) {
+    console.error("Failed to fetch trending products:", error);
+    return [];
+  }
+}
+
+// Get new arrivals (by newest first)
+export async function getNewArrivals(limit: number = 8) {
+  ensureServerOnly();
+  
+  try {
+    const newArrivals = await db
+      .select()
+      .from(productsTable)
+      .orderBy(desc(productsTable.createdAt))
+      .limit(limit);
+    return newArrivals as Product[];
+  } catch (error) {
+    console.error("Failed to fetch new arrivals:", error);
+    return [];
+  }
+}
+
+// Get product by ID
+export async function getProductById(id: string): Promise<Product | null> {
+  ensureServerOnly();
+  
+  try {
+    const [product] = await db
+      .select()
+      .from(productsTable)
+      .where(eq(productsTable.id, id));
+    return product as Product || null;
+  } catch (error) {
+    console.error("Failed to fetch product:", error);
+    return null;
+  }
+}
+
+// Get related products (excluding current product)
+export async function getRelatedProducts(id: string, limit: number = 4): Promise<Product[]> {
+  ensureServerOnly();
+  
+  try {
+    const allProducts = await getAllProducts();
+    return allProducts.filter(p => p.id !== id).slice(0, limit);
+  } catch (error) {
+    console.error("Failed to fetch related products:", error);
+    return [];
+  }
+}
+
+// For backward compatibility - this will be populated on server start
+export let products: Product[] = [];
+
+// Initialize products on server start
+export async function initProducts() {
+  ensureServerOnly();
+  products = await getAllProducts();
+  return products;
+}

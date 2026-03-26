@@ -5,7 +5,8 @@ import Link from "next/link";
 import Image from "next/image";
 import {
   LayoutDashboard, Package, ShoppingBag, Settings,
-  LogOut, Menu, X, ChevronRight, Home, Paperclip
+  LogOut, Menu, X, ChevronRight, Home, Paperclip,
+  Contact
 } from "lucide-react";
 
 const ADMIN_PASSWORD = "admin123"; // change this
@@ -15,6 +16,7 @@ const navItems = [
   { label: "HomePage", href: "/admin/homepage", icon: Home },
   { label: "Products", href: "/admin/products", icon: Package },
   { label: "Orders", href: "/admin/orders", icon: ShoppingBag },
+  { label: "Contact", href: "/admin/contact", icon: Contact },
   { label: "Pages", href: "/admin/pages", icon: Paperclip },
   { label: "Settings", href: "/admin/settings", icon: Settings },
 ];

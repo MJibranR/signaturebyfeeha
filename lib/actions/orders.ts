@@ -8,6 +8,15 @@ export async function getOrders() {
   return await db.select().from(orders).orderBy(orders.createdAt);
 }
 
+export async function getOrdersByPhone(phone: string) {
+  return await db.select().from(orders).where(eq(orders.phone, phone)).orderBy(orders.createdAt);
+}
+
+// ── NEW ──
+export async function getOrdersByEmail(email: string) {
+  return await db.select().from(orders).where(eq(orders.email, email)).orderBy(orders.createdAt);
+}
+
 export async function createOrder(data: typeof orders.$inferInsert) {
   await db.insert(orders).values(data);
   revalidatePath("/admin/orders");

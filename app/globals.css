@@ -25,3 +25,14 @@ body {
   color: var(--foreground);
   font-family: "Georgia", "Times New Roman", serif;
 }
+
+/* Ensure dropdowns appear above everything */
+.dropdown-container {
+  position: relative;
+  z-index: 10;
+}
+
+.dropdown-menu {
+  position: absolute;
+  z-index: 9999;
+}

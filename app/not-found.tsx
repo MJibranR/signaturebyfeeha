@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import Logo from '../images/Logo1-without-bg.png'
+import Logo from '../public/images/Logo1-without-bg.png'
 
 export default function NotFound() {
   return (

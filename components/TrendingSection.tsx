@@ -1,6 +1,5 @@
-import { db } from "@/lib/db";
-import { products } from "@/lib/schema";
-import { desc } from "drizzle-orm";
+// components/TrendingSection.tsx
+import { Product } from "@/lib/products";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -17,14 +16,12 @@ function Stars({ rating }: { rating: number }) {
   );
 }
 
-export default async function TrendingSection() {
-  let trendingProducts: any[] = [];
-  try {
-    trendingProducts = await db.select().from(products).orderBy(desc(products.reviews)).limit(8);
-  } catch {
-    return null;
-  }
-  if (!trendingProducts.length) return null;
+interface TrendingSectionProps {
+  products: Product[];
+}
+
+export default function TrendingSection({ products }: TrendingSectionProps) {
+  if (!products.length) return null;
 
   return (
     <section className="py-10 px-4 md:px-6">
@@ -35,7 +32,7 @@ export default async function TrendingSection() {
           <div className="h-px flex-1" style={{ background: "linear-gradient(to left, transparent, #C9A84C)" }} />
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 md:gap-5">
-          {trendingProducts.map(product => (
+          {products.map(product => (
             <Link key={product.id} href={`/products/${product.id}`} className="group block">
               <div className="relative rounded-2xl overflow-hidden mb-3 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
                 style={{ aspectRatio: "3/4", background: "rgba(255,255,255,0.85)", border: "1px solid rgba(201,168,76,0.2)" }}>

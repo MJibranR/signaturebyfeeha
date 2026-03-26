@@ -1,4 +1,5 @@
-import { getReviews } from "@/lib/actions/misc";
+// components/Reviews.tsx
+import { Review } from "@/lib/actions/homepage";
 
 function Stars({ rating }: { rating: number }) {
   return (
@@ -13,13 +14,11 @@ function Stars({ rating }: { rating: number }) {
   );
 }
 
-export default async function Reviews() {
-  let reviews: any[] = [];
-  try {
-    reviews = await getReviews();
-  } catch {
-    return null;
-  }
+interface ReviewsProps {
+  reviews: Review[];
+}
+
+export default function Reviews({ reviews }: ReviewsProps) {
   if (!reviews.length) return null;
 
   return (

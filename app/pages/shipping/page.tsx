@@ -1,26 +1,88 @@
-import React from "react";
+"use client";
+import { useState, useEffect } from "react";
+import { getPageData } from "@/lib/actions/pages";
 
-const faqs = [
-  {
-    q: "What is the process for Cash on Delivery (COD) purchase?",
-    a: "When you make a purchase using the COD option, your product will be booked. You will receive a call from us to confirm your order before it gets dispatched. If you are unreachable or unable to attend the call, please contact us if you are still interested in receiving the product.",
-  },
-  {
-    q: "Are there any hidden charges?",
-    a: "There are absolutely NO hidden charges. You pay only the amount that you see in your order summary. What you see is what you pay — always.",
-  },
-  {
-    q: "When will my order be dispatched?",
-    a: "Orders are typically dispatched within 1–2 working days of confirmation. You will receive a WhatsApp notification with your tracking details once your order is on its way.",
-  },
-];
+type ShippingFAQ = {
+  id: number;
+  q: string;
+  a: string;
+};
+
+type ShippingData = {
+  heroText: string;
+  subText: string;
+  deliveryDays: string;
+  payment: string;
+  coverage: string;
+  faqs: ShippingFAQ[];
+};
+
+// Default shipping data as fallback
+const DEFAULT_SHIPPING: ShippingData = {
+  heroText: "FREE Shipping All Over Pakistan",
+  subText: "No minimum order. No hidden fees. Always free.",
+  deliveryDays: "2–4",
+  payment: "Cash on Delivery (COD)",
+  coverage: "All cities across Pakistan",
+  faqs: [
+    {
+      id: 1,
+      q: "What is the process for Cash on Delivery (COD) purchase?",
+      a: "When you make a purchase using the COD option, your product will be booked. You will receive a call from us to confirm your order before it gets dispatched. If you are unreachable or unable to attend the call, please contact us if you are still interested in receiving the product.",
+    },
+    {
+      id: 2,
+      q: "Are there any hidden charges?",
+      a: "There are absolutely NO hidden charges. You pay only the amount that you see in your order summary. What you see is what you pay — always.",
+    },
+    {
+      id: 3,
+      q: "When will my order be dispatched?",
+      a: "Orders are typically dispatched within 1–2 working days of confirmation. You will receive a WhatsApp notification with your tracking details once your order is on its way.",
+    },
+  ],
+};
 
 export default function ShippingPage() {
+  const [shipping, setShipping] = useState<ShippingData>(DEFAULT_SHIPPING);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch shipping data from Neon DB on mount
+  useEffect(() => {
+    async function loadShipping() {
+      try {
+        const data = await getPageData("shipping");
+        if (data) {
+          setShipping(data as ShippingData);
+        }
+      } catch (error) {
+        console.error("Failed to load shipping data:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadShipping();
+  }, []);
+
+  // Show loading state
+  if (loading) {
+    return (
+      <main className="min-h-screen py-16 px-4">
+        <div className="max-w-screen-md mx-auto">
+          <div className="text-center mb-12">
+            <div className="flex justify-center items-center gap-3">
+              <div className="w-6 h-6 border-2 border-[#C9A84C] border-t-transparent rounded-full animate-spin" />
+              <p className="text-sm" style={{ color: "#8B6914" }}>Loading Shipping Information...</p>
+            </div>
+          </div>
+        </div>
+      </main>
+    );
+  }
+
   return (
     <>
-      <main
-        className="min-h-screen py-16 px-4"
-      >
+      <main className="min-h-screen py-16 px-4">
         <div className="max-w-screen-md mx-auto">
 
           {/* Heading */}
@@ -76,10 +138,10 @@ export default function ShippingPage() {
                 FREE
               </p>
               <p className="text-lg font-black tracking-[0.15em] uppercase text-white mb-2" style={{ fontFamily: "Georgia, serif" }}>
-                Shipping All Over Pakistan
+                {shipping.heroText}
               </p>
               <p className="text-sm" style={{ color: "rgba(255,255,255,0.6)", fontStyle: "italic", fontFamily: "Georgia, serif" }}>
-                No minimum order. No hidden fees. Always free.
+                {shipping.subText}
               </p>
             </div>
           </div>
@@ -110,9 +172,9 @@ export default function ShippingPage() {
               <div className="grid grid-cols-2 gap-3">
                 {[
                   { label: "Shipping Fee", value: "FREE", highlight: true },
-                  { label: "Payment", value: "Cash on Delivery (COD)" },
-                  { label: "Standard Delivery", value: "2–4 working days" },
-                  { label: "Coverage", value: "All cities across Pakistan" },
+                  { label: "Payment", value: shipping.payment },
+                  { label: "Standard Delivery", value: `${shipping.deliveryDays} working days` },
+                  { label: "Coverage", value: shipping.coverage },
                 ].map((row, i) => (
                   <div key={i} className="flex flex-col gap-0.5">
                     <span className="text-[10px] tracking-widest uppercase" style={{ color: "#a89070" }}>{row.label}</span>
@@ -125,9 +187,9 @@ export default function ShippingPage() {
 
           {/* FAQ sections */}
           <div className="flex flex-col gap-4 mb-8">
-            {faqs.map((faq, i) => (
+            {shipping.faqs.map((faq) => (
               <div
-                key={i}
+                key={faq.id}
                 className="rounded-2xl px-8 py-6"
                 style={{
                   background: "rgba(255,255,255,0.75)",
