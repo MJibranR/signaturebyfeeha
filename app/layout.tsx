@@ -8,6 +8,7 @@ import AnnouncementBar from "@/components/AnnouncementBar";
 import Navbar from "@/components/Navbar";
 import { CartProvider } from "@/context/CartContext";
 import Footer from "@/components/Footer";
+import Bg from "@/public/images/bg.png";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -24,13 +25,11 @@ export const metadata: Metadata = {
   description: "Make by Muhammad Jibran Rehan",
 };
 
-// Make layout async to fetch data
 export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // Fetch config inside the component
   const config = await getHomepageConfig();
   const homepageConfig = config || DEFAULT_HOMEPAGE_CONFIG;
 
@@ -39,9 +38,16 @@ export default async function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">
+      <body
+        className="min-h-full flex flex-col"
+        style={{
+          backgroundImage: `url(${Bg.src})`,
+          backgroundRepeat: "repeat",   // or "no-repeat" depending on your image
+          backgroundSize: "auto",        // or "cover" for full-bleed
+          backgroundAttachment: "fixed", // keeps bg fixed while scrolling
+        }}
+      >
         <CartProvider>
-          {/* Announcement Bar */}
           {homepageConfig.announcement && (
             <AnnouncementBar text={homepageConfig.announcement} dismissible={true} />
           )}
