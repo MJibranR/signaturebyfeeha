@@ -85,8 +85,8 @@ export default function Footer() {
               </p>
               <p className="text-xs" style={{ color: "#5a3e1a" }}>
                 Phone:{" "}
-                <a href="tel:+923353537028" className="hover:text-[#8B6914] transition-colors">
-                  +92 335 3537028
+                <a href="tel:+923033708804" className="hover:text-[#8B6914] transition-colors">
+                  +92 303 3708804
                 </a>
               </p>
               <p className="text-xs" style={{ color: "#5a3e1a" }}>
@@ -151,7 +151,7 @@ export default function Footer() {
                   <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
                 </svg>
               </a>
-              <a href="https://wa.me/923353537028" target="_blank" rel="noopener noreferrer"
+              <a href="https://wa.me/923033708804" target="_blank" rel="noopener noreferrer"
                 className="transition-all hover:scale-110" aria-label="WhatsApp">
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
@@ -170,7 +170,7 @@ export default function Footer() {
           <span className="font-bold">Muhammad Jibran Rehan</span>
         </p>
         <p className="text-[11px]" style={{ color: "#a89070" }}>
-          +92 335 3537028 · Scentsbysignature@gmail.com
+          +92 303 3708804 · scentsbysignature@gmail.com
         </p>
       </div>
     </footer>

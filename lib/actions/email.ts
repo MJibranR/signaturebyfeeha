@@ -47,7 +47,7 @@ export async function sendReplyEmail(to: string, name: string, reply: string, or
           </div>
           
           <p style="color: #5a3e1a; font-size: 14px; margin-top: 20px;">
-            If you have any further questions, feel free to reply to this email or contact us on WhatsApp at +923353537028.
+            If you have any further questions, feel free to reply to this email or contact us on WhatsApp at +923033708804.
           </p>
           
           <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid rgba(201,168,76,0.3); text-align: center;">

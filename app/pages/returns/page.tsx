@@ -28,7 +28,7 @@ const DEFAULT_RETURN_POLICY: ReturnPolicyData = {
     { id: 4, text: "The wrong product was delivered." },
   ],
   steps: [
-    { id: 1, text: "Contact our Customer Service team within 48 hours of receiving your order. You can reach us via WhatsApp at +923353537028 or via the contact form on our website." },
+    { id: 1, text: "Contact our Customer Service team within 48 hours of receiving your order. You can reach us via WhatsApp at +923033708804 or via the contact form on our website." },
     { id: 2, text: "Please provide clear photos of the damage to the packaging and/or products." },
     { id: 3, text: "Upon verification, we will arrange for a free replacement or exchange within 7 days." },
   ],
@@ -246,7 +246,7 @@ export default function ReturnPolicyPage() {
               We appreciate your understanding. If you have any questions regarding this policy, please don't hesitate to{" "}
               <a href="/contact" className="font-bold underline hover:text-[#1a0a00] transition-colors" style={{ textUnderlineOffset: "3px" }}>contact us</a>{" "}
               or reach us on WhatsApp at{" "}
-              <a href="https://wa.me/923353537028" className="font-bold underline hover:text-[#1a0a00] transition-colors" style={{ textUnderlineOffset: "3px" }}>+923353537028</a>.
+              <a href="https://wa.me/923033708804" className="font-bold underline hover:text-[#1a0a00] transition-colors" style={{ textUnderlineOffset: "3px" }}>+923033708804</a>.
             </p>
           </div>
 

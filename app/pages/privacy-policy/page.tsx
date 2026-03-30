@@ -183,8 +183,8 @@ export default function PrivacyPolicyPage() {
             </svg>
             <p className="text-xs leading-relaxed" style={{ color: "#8B6914" }}>
               For questions about this policy, contact us at{" "}
-              <a href="mailto:signaturebyfeeha@gmail.com" className="font-bold underline hover:text-[#1a0a00] transition-colors" style={{ textUnderlineOffset: "3px" }}>
-                signaturebyfeeha@gmail.com
+              <a href="mailto:scentsbysignature@gmail.com" className="font-bold underline hover:text-[#1a0a00] transition-colors" style={{ textUnderlineOffset: "3px" }}>
+                scentsbysignature@gmail.com
               </a>
             </p>
           </div>

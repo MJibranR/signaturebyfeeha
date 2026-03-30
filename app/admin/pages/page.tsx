@@ -60,7 +60,7 @@ const DEFAULT_RETURN = {
     { id: 2, text: "The wrong product was delivered." },
   ] as ReturnItem[],
   steps: [
-    { id: 1, text: "Contact our Customer Service team within 48 hours via WhatsApp at +923353537028." },
+    { id: 1, text: "Contact our Customer Service team within 48 hours via WhatsApp at +923033708804." },
     { id: 2, text: "Please provide clear photos of the damage to the packaging and/or products." },
   ] as ReturnItem[],
   notes: [

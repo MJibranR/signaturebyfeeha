@@ -223,7 +223,7 @@ export default function ShippingPage() {
             </svg>
             <p className="text-xs leading-relaxed" style={{ color: "#8B6914" }}>
               For any shipping queries, reach us on WhatsApp at{" "}
-              <a href="https://wa.me/923353537028" className="font-bold underline hover:text-[#1a0a00] transition-colors" style={{ textUnderlineOffset: "3px" }}>+92 335 3537028</a>{" "}
+              <a href="https://wa.me/923033708804" className="font-bold underline hover:text-[#1a0a00] transition-colors" style={{ textUnderlineOffset: "3px" }}>+92 303 3708804</a>{" "}
               or visit our{" "}
               <a href="/contact" className="font-bold underline hover:text-[#1a0a00] transition-colors" style={{ textUnderlineOffset: "3px" }}>contact page</a>.
             </p>

@@ -22,8 +22,8 @@ type StoreSettings = {
 const DEFAULT: StoreSettings = {
   storeName: "Signature by Feeha",
   email: "Scentsbysignature@gmail.com",
-  phone: "+92 335 3537028",
-  whatsapp: "923353537028",
+  phone: "+92 303 3708804",
+  whatsapp: "923033708804",
   address: "Sector 15-B, Buffer Zone, North Karachi, Karachi",
   instagram: "https://www.instagram.com/signature_by_feeha/",
   facebook: "https://www.facebook.com/profile.php?id=61586351197047",

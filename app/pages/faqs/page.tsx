@@ -29,7 +29,7 @@ const DEFAULT_FAQS: FAQ[] = [
   {
     id: 4,
     q: "How do I place an order?",
-    a: "Placing an order is very simple. Our website is designed to make order processing smooth and intuitive. You can create an account or check out as a guest. You can also place an order by calling us or leaving a message on WhatsApp at +923353537028.",
+    a: "Placing an order is very simple. Our website is designed to make order processing smooth and intuitive. You can create an account or check out as a guest. You can also place an order by calling us or leaving a message on WhatsApp at +923033708804.",
   },
   {
     id: 5,
@@ -219,7 +219,7 @@ export default function FAQsPage() {
               </p>
             </div>
             <a
-              href="https://wa.me/923353537028"
+              href="https://wa.me/923033708804"
               target="_blank"
               rel="noopener noreferrer"
               className="flex-shrink-0 flex items-center gap-2 px-7 py-3 rounded-xl text-xs font-black tracking-[0.2em] uppercase transition-all hover:scale-105"

@@ -80,8 +80,8 @@ export default function ContactPage() {
                 </svg>
               ),
               label: "Phone",
-              value: "3353537028",
-              href: "tel:3353537028",
+              value: "3033708804",
+              href: "tel:3033708804",
             },
             {
               icon: (

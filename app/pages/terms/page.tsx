@@ -43,7 +43,7 @@ const DEFAULT_SECTIONS: Section[] = [
   {
     id: 7,
     title: "Communication",
-    body: "Any suggestions, feedback, complaints, and instructions regarding your order are to be given through call or email using the following details:\n\n• Phone: +923353537028\n• Email: signaturebyfeeha@gmail.com\n• WhatsApp: +923353537028",
+    body: "Any suggestions, feedback, complaints, and instructions regarding your order are to be given through call or email using the following details:\n\n• Phone: +923033708804\n• Email: scentsbysignature@gmail.com\n• WhatsApp: +923033708804",
   },
 ];
 
@@ -228,12 +228,12 @@ export default function TermsPage() {
             </svg>
             <p className="text-xs leading-relaxed" style={{ color: "#8B6914" }}>
               By using the Signature by Feeha website, you hereby consent to these Terms &amp; Conditions. For any queries, contact us at{" "}
-              <a href="mailto:signaturebyfeeha@gmail.com" className="font-bold underline hover:text-[#1a0a00] transition-colors" style={{ textUnderlineOffset: "3px" }}>
-                signaturebyfeeha@gmail.com
+              <a href="mailto:scentsbysignature@gmail.com" className="font-bold underline hover:text-[#1a0a00] transition-colors" style={{ textUnderlineOffset: "3px" }}>
+                scentsbysignature@gmail.com
               </a>{" "}
               or call{" "}
-              <a href="tel:+923353537028" className="font-bold underline hover:text-[#1a0a00] transition-colors" style={{ textUnderlineOffset: "3px" }}>
-                +923353537028
+              <a href="tel:+923033708804" className="font-bold underline hover:text-[#1a0a00] transition-colors" style={{ textUnderlineOffset: "3px" }}>
+                +923033708804
               </a>.
             </p>
           </div>

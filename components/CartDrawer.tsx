@@ -19,7 +19,7 @@ interface StoredUser {
   phone?: string;
 }
 
-const WHATSAPP_NUMBER = "923353537028";
+const WHATSAPP_NUMBER = "923033708804";
 
 export default function CartDrawer({ open, onClose }: CartDrawerProps) {
   const { items, removeFromCart, updateQty, total, count, clearCart } = useCart();
