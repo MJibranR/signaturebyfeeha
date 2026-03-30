@@ -109,7 +109,7 @@ export default function Navbar() {
 
       {/* ── Navbar ── */}
 <header
-  className="border-b border-stone-200 sticky top-0 z-[40]"
+  className="border-b border-stone-200 top-0 z-[40]"
   style={{ backgroundColor: "rgba(255,255,255,0.85)", backdropFilter: "blur(10px)" }}
 >
         <div className="max-w-screen-xl mx-auto px-4 md:px-6 py-2.5 md:py-3 flex items-center justify-between">

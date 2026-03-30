@@ -18,8 +18,8 @@ type Product = {
 };
 
 const SORT_OPTIONS = [
-  { label: "Alphabetically, A-Z",  value: "az" },
-  { label: "Alphabetically, Z-A",  value: "za" },
+  { label: "A to Z",  value: "az" },
+  { label: "Z to A",  value: "za" },
   { label: "Price: Low to High",   value: "price-asc" },
   { label: "Price: High to Low",   value: "price-desc" },
   { label: "Best Reviewed",        value: "rating" },
