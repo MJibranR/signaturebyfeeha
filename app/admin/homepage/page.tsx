@@ -1,25 +1,17 @@
 "use client";
 export const dynamic = "force-dynamic";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { getHomepageConfig, saveHomepageConfig } from "@/lib/actions/homepage";
 import { getAllProductsAction } from "@/lib/actions/products";
-import ImageUploadBox from "@/components/ImageUploadBox"; // Import the new component
-import VideoPathInput from "@/components/VideoPathInput"; // Import for videos
-import { ChevronDown, ChevronUp, Upload, Plus, Trash2, Eye, EyeOff, Check, X } from "lucide-react";
+import VideoPathInput from "@/components/VideoPathInput";
+import { ChevronDown, ChevronUp, Upload, Plus, Trash2, Eye, EyeOff, Check, X, Search } from "lucide-react";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
 type FeaturedSet = {
-  id: number;
-  name: string;
-  brand: string;
-  tagline: string;
-  imagePreview: string;
-  videoName: string;
-  videoPath: string;
-  imageLeft: boolean;
-  bg: string;
-  href: string;
+  id: number; name: string; brand: string; tagline: string;
+  imagePreview: string; videoName: string; videoPath: string;
+  imageLeft: boolean; bg: string; href: string;
 };
 
 type Brand = { id: number; name: string; image: string; href: string };
@@ -27,14 +19,9 @@ type Review = { id: number; name: string; title: string; body: string; rating: n
 
 type HomepageConfig = {
   sections: { key: string; label: string; enabled: boolean }[];
-  heroImage: string;
-  heroVideo?: string;
-  heroType?: 'image' | 'video';
-  trendingProducts: string[];
-  featuredSets: FeaturedSet[];
-  newArrivalProducts: string[];
-  brands: Brand[];
-  reviews: Review[];
+  heroImage: string; heroVideo?: string; heroType?: "image" | "video";
+  trendingProducts: string[]; featuredSets: FeaturedSet[];
+  newArrivalProducts: string[]; brands: Brand[]; reviews: Review[];
   announcement: string;
 };
 
@@ -43,17 +30,15 @@ type HomepageConfig = {
 const DEFAULT_CONFIG: HomepageConfig = {
   announcement: "Please confirm order via phone/WhatsApp, orders not confirmed within 24 hours may be cancelled",
   sections: [
-    { key: "hero", label: "Hero Section", enabled: true },
-    { key: "services", label: "Services Section", enabled: true },
-    { key: "trending", label: "Trending Now", enabled: true },
-    { key: "featured", label: "Featured Products", enabled: true },
-    { key: "arrivals", label: "New Arrivals", enabled: true },
-    { key: "brands", label: "Top Brands", enabled: true },
-    { key: "reviews", label: "Customer Reviews", enabled: true },
+    { key: "hero",     label: "Hero Section",       enabled: true },
+    { key: "services", label: "Services Section",   enabled: true },
+    { key: "trending", label: "Trending Now",        enabled: true },
+    { key: "featured", label: "Featured Products",  enabled: true },
+    { key: "arrivals", label: "New Arrivals",        enabled: true },
+    { key: "brands",   label: "Top Brands",          enabled: true },
+    { key: "reviews",  label: "Customer Reviews",    enabled: true },
   ],
-  heroImage: "",
-  heroVideo: "",
-  heroType: "image",
+  heroImage: "", heroVideo: "", heroType: "image",
   trendingProducts: [],
   featuredSets: [
     { id: 1, name: "Oud Wood", brand: "Tom Ford", tagline: "Pour Homme · Woody Oriental", imagePreview: "", videoName: "", videoPath: "/video/perfume/oud.mp4", imageLeft: true, bg: "linear-gradient(135deg, #1a0800 0%, #2d1200 100%)", href: "/products/oud-wood" },
@@ -63,20 +48,20 @@ const DEFAULT_CONFIG: HomepageConfig = {
   newArrivalProducts: [],
   brands: [
     { id: 1, name: "Tom Ford", image: "", href: "/brands/tom-ford" },
-    { id: 2, name: "Gucci", image: "", href: "/brands/gucci" },
-    { id: 3, name: "Creed", image: "", href: "/brands/creed" },
-    { id: 4, name: "Dior", image: "", href: "/brands/dior" },
-    { id: 5, name: "Lattafa", image: "", href: "/brands/lattafa" },
-    { id: 6, name: "Afnan", image: "", href: "/brands/afnan" },
-    { id: 7, name: "Rayhaan", image: "", href: "/brands/rayhaan" },
+    { id: 2, name: "Gucci",    image: "", href: "/brands/gucci"    },
+    { id: 3, name: "Creed",    image: "", href: "/brands/creed"    },
+    { id: 4, name: "Dior",     image: "", href: "/brands/dior"     },
+    { id: 5, name: "Lattafa",  image: "", href: "/brands/lattafa"  },
+    { id: 6, name: "Afnan",    image: "", href: "/brands/afnan"    },
+    { id: 7, name: "Rayhaan",  image: "", href: "/brands/rayhaan"  },
   ],
   reviews: [
-    { id: 1, name: "Umar Jawaid", title: "Awesome Fragrance", body: "A very exotic and spicy fragrance. Worth spending every rupee on it.", rating: 5 },
-    { id: 2, name: "Asim Ali", title: "Finally Found a Reliable Perfume Store", body: "I had a great experience shopping at Signature by Feeha. Fast delivery and original products.", rating: 5 },
-    { id: 3, name: "Khurram Amin", title: "Amazing CS Experience", body: "I had an absolutely amazing customer service experience. The team was so helpful.", rating: 5 },
-    { id: 4, name: "Sara Malik", title: "Best Oud Collection", body: "The oud selection here is unmatched. Authentic, long-lasting and beautifully packaged.", rating: 5 },
-    { id: 5, name: "Bilal Qureshi", title: "Super Fast Delivery", body: "Ordered on Monday, received Tuesday. Packaging was premium.", rating: 5 },
-    { id: 6, name: "Hina Farooq", title: "My Go-To Fragrance Store", body: "I've ordered 4 times now and every single time the experience has been flawless.", rating: 5 },
+    { id: 1, name: "Umar Jawaid",    title: "Awesome Fragrance",                    body: "A very exotic and spicy fragrance. Worth spending every rupee on it.",                              rating: 5 },
+    { id: 2, name: "Asim Ali",       title: "Finally Found a Reliable Perfume Store", body: "I had a great experience shopping at Signature by Feeha. Fast delivery and original products.", rating: 5 },
+    { id: 3, name: "Khurram Amin",   title: "Amazing CS Experience",                body: "I had an absolutely amazing customer service experience. The team was so helpful.",               rating: 5 },
+    { id: 4, name: "Sara Malik",     title: "Best Oud Collection",                  body: "The oud selection here is unmatched. Authentic, long-lasting and beautifully packaged.",         rating: 5 },
+    { id: 5, name: "Bilal Qureshi",  title: "Super Fast Delivery",                  body: "Ordered on Monday, received Tuesday. Packaging was premium.",                                     rating: 5 },
+    { id: 6, name: "Hina Farooq",    title: "My Go-To Fragrance Store",             body: "I've ordered 4 times now and every single time the experience has been flawless.",               rating: 5 },
   ],
 };
 
@@ -92,7 +77,6 @@ function Toggle({ checked, onChange }: { checked: boolean; onChange: () => void 
   );
 }
 
-// In your SectionCard component, make sure it doesn't have overflow: hidden
 function SectionCard({ title, children, defaultOpen = false }: { title: string; children: React.ReactNode; defaultOpen?: boolean }) {
   const [open, setOpen] = useState(defaultOpen);
   return (
@@ -108,6 +92,291 @@ function SectionCard({ title, children, defaultOpen = false }: { title: string; 
   );
 }
 
+// ─── Dual Image Input ─────────────────────────────────────────────────────────
+// Upload file OR paste URL/path OR search existing images — mirrors ProductForm
+
+function DualImageInput({
+  value,
+  onChange,
+  imageSuggestions,
+  label = "Product Image",
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  imageSuggestions: string[];
+  label?: string;
+}) {
+  const [imageSearch, setImageSearch] = useState("");
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  const filtered = imageSuggestions.filter(s =>
+    s.toLowerCase().includes(imageSearch.toLowerCase())
+  );
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setShowSuggestions(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => onChange(reader.result as string);
+    reader.readAsDataURL(file);
+  };
+
+  const handleSelectSuggestion = (url: string) => {
+    onChange(url);
+    setImageSearch("");
+    setShowSuggestions(false);
+  };
+
+  return (
+    <div>
+      <label className="text-[10px] font-black tracking-[0.22em] uppercase mb-2 block" style={{ color: "#8B6914" }}>
+        {label}
+      </label>
+      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+        {/* Preview */}
+        <div className="w-20 h-20 rounded-xl overflow-hidden flex-shrink-0 flex items-center justify-center"
+          style={{ background: "rgba(245,240,235,0.9)", border: "1.5px solid rgba(201,168,76,0.25)" }}>
+          {value
+            ? <img src={value} alt="preview" className="w-full h-full object-contain p-1.5" />
+            : <Upload size={20} color="rgba(201,168,76,0.4)" />}
+        </div>
+
+        <div className="flex flex-col gap-2 flex-1 w-full" ref={ref}>
+          {/* Upload button */}
+          <label className="cursor-pointer flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold tracking-wide transition-all hover:scale-105 self-start"
+            style={{ background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.3)", color: "#8B6914" }}>
+            <Upload size={13} /> Upload Image
+            <input type="file" accept="image/*" onChange={handleFileUpload} className="hidden" />
+          </label>
+
+          {/* URL / path input */}
+          <input
+            type="text"
+            placeholder="Or paste image URL / path..."
+            value={value.startsWith("data:") ? "" : value}
+            onChange={e => onChange(e.target.value)}
+            className="w-full px-3 py-2 rounded-lg text-xs outline-none"
+            style={{ background: "#f8f5f0", border: "1.5px solid rgba(201,168,76,0.2)", color: "#1a0a00" }}
+            onFocus={e => (e.target.style.border = "1.5px solid #C9A84C")}
+            onBlur={e => (e.target.style.border = "1.5px solid rgba(201,168,76,0.2)")}
+          />
+
+          {/* Search existing images */}
+          {imageSuggestions.length > 0 && (
+            <div className="relative w-full">
+              <div className="flex items-center gap-2 px-3 py-2 rounded-lg"
+                style={{ background: "#f8f5f0", border: "1.5px solid rgba(201,168,76,0.2)" }}>
+                <Search size={12} color="#8B6914" className="flex-shrink-0" />
+                <input
+                  type="text"
+                  placeholder="Search existing images..."
+                  value={imageSearch}
+                  onChange={e => { setImageSearch(e.target.value); setShowSuggestions(true); }}
+                  onFocus={() => setShowSuggestions(true)}
+                  className="flex-1 text-xs bg-transparent outline-none min-w-0"
+                  style={{ color: "#1a0a00" }}
+                />
+                {imageSearch && (
+                  <button onClick={() => { setImageSearch(""); setShowSuggestions(false); }}>
+                    <X size={11} color="#a89070" />
+                  </button>
+                )}
+              </div>
+              {showSuggestions && filtered.length > 0 && (
+                <div className="absolute z-20 mt-1 w-full rounded-xl overflow-hidden shadow-lg"
+                  style={{ background: "#fff", border: "1px solid rgba(201,168,76,0.2)", maxHeight: 200, overflowY: "auto" }}>
+                  {filtered.map((url, i) => (
+                    <button key={i} onClick={() => handleSelectSuggestion(url)}
+                      className="flex items-center gap-2 w-full px-3 py-2 text-xs hover:bg-amber-50 transition-colors text-left"
+                      style={{ color: "#1a0a00", borderBottom: "1px solid rgba(201,168,76,0.06)" }}>
+                      <img src={url} alt="" className="w-6 h-6 object-contain rounded flex-shrink-0"
+                        style={{ background: "rgba(245,240,235,0.9)" }} />
+                      <span className="truncate">{url.split("/").pop()}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Clear button */}
+          {value && (
+            <button onClick={() => onChange("")}
+              className="flex items-center gap-1.5 text-[10px] self-start transition-opacity hover:opacity-70"
+              style={{ color: "#c94444" }}>
+              <X size={10} /> Clear image
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Product Link Picker ──────────────────────────────────────────────────────
+
+function ProductLinkPicker({
+  value, onChange, allProducts,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  allProducts: any[];
+}) {
+  const [query, setQuery] = useState("");
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  const filtered = allProducts.filter(p =>
+    p.name.toLowerCase().includes(query.toLowerCase()) ||
+    p.brand.toLowerCase().includes(query.toLowerCase())
+  );
+
+  const selected = allProducts.find(p => `/products/${p.id}` === value);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  return (
+    <div ref={ref} className="relative">
+      <label className="text-[10px] font-black tracking-[0.22em] uppercase mb-1 block" style={{ color: "#8B6914" }}>
+        Product Link (href)
+      </label>
+
+      {selected ? (
+        <div className="flex items-center gap-2 px-3 py-2 rounded-xl"
+          style={{ background: "rgba(201,168,76,0.08)", border: "1.5px solid #C9A84C" }}>
+          <img src={selected.image} alt={selected.name} className="w-6 h-6 object-contain rounded flex-shrink-0" />
+          <span className="text-xs font-semibold flex-1 truncate" style={{ color: "#1a0a00" }}>{selected.name}</span>
+          <span className="text-[10px]" style={{ color: "#a89070" }}>{`/products/${selected.id}`}</span>
+          <button onClick={() => { onChange(""); setQuery(""); }}
+            className="w-4 h-4 flex items-center justify-center flex-shrink-0">
+            <X size={11} color="#c94444" />
+          </button>
+        </div>
+      ) : (
+        <div className="relative">
+          <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl"
+            style={{ background: "#f8f5f0", border: "1.5px solid rgba(201,168,76,0.2)" }}>
+            <Search size={12} color="#8B6914" className="flex-shrink-0" />
+            <input
+              type="text"
+              placeholder="Search or type /products/..."
+              value={query || value}
+              onChange={e => { setQuery(e.target.value); onChange(e.target.value); setOpen(true); }}
+              onFocus={() => setOpen(true)}
+              className="flex-1 text-xs bg-transparent outline-none min-w-0"
+              style={{ color: "#1a0a00" }}
+            />
+            {(query || value) && (
+              <button onClick={() => { setQuery(""); onChange(""); }}>
+                <X size={11} color="#a89070" />
+              </button>
+            )}
+          </div>
+          {open && filtered.length > 0 && (
+            <div className="absolute z-20 mt-1 w-full rounded-xl overflow-hidden shadow-lg"
+              style={{ background: "#fff", border: "1px solid rgba(201,168,76,0.2)", maxHeight: 220, overflowY: "auto" }}>
+              {filtered.map(p => (
+                <button key={p.id} onClick={() => { onChange(`/products/${p.id}`); setQuery(""); setOpen(false); }}
+                  className="flex items-center gap-3 w-full px-3 py-2.5 text-left hover:bg-amber-50/60 transition-colors"
+                  style={{ borderBottom: "1px solid rgba(201,168,76,0.08)" }}>
+                  <img src={p.image} alt={p.name} className="w-7 h-7 object-contain rounded flex-shrink-0"
+                    style={{ background: "rgba(245,240,235,0.9)" }} />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-semibold truncate" style={{ color: "#1a0a00" }}>{p.name}</p>
+                    <p className="text-[10px]" style={{ color: "#a89070" }}>{p.brand} · /products/{p.id}</p>
+                  </div>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Simple Image Suggestion Input ───────────────────────────────────────────
+
+function ImageSuggestionInput({
+  value, onChange, suggestions, placeholder = "Image path or URL...",
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  suggestions: string[];
+  placeholder?: string;
+}) {
+  const [query, setQuery] = useState("");
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  const filtered = suggestions.filter(s =>
+    s.toLowerCase().includes((query || value).toLowerCase())
+  );
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  return (
+    <div ref={ref} className="relative">
+      <div className="flex items-center gap-2 px-3 py-2 rounded-lg"
+        style={{ background: "#fff", border: "1px solid rgba(201,168,76,0.2)" }}>
+        {value && (
+          <img src={value} alt="" className="w-5 h-5 object-contain rounded flex-shrink-0" />
+        )}
+        <input
+          type="text"
+          placeholder={placeholder}
+          value={query || value}
+          onChange={e => { setQuery(e.target.value); onChange(e.target.value); setOpen(true); }}
+          onFocus={() => setOpen(true)}
+          className="flex-1 text-xs bg-transparent outline-none min-w-0"
+          style={{ color: "#1a0a00" }}
+        />
+        {value && (
+          <button onClick={() => { onChange(""); setQuery(""); }}>
+            <X size={11} color="#a89070" />
+          </button>
+        )}
+      </div>
+      {open && filtered.length > 0 && (
+        <div className="absolute z-20 mt-1 w-full rounded-xl overflow-hidden shadow-lg"
+          style={{ background: "#fff", border: "1px solid rgba(201,168,76,0.2)", maxHeight: 180, overflowY: "auto" }}>
+          {filtered.map((url, i) => (
+            <button key={i} onClick={() => { onChange(url); setQuery(""); setOpen(false); }}
+              className="flex items-center gap-2 w-full px-3 py-2 text-left hover:bg-amber-50/60 transition-colors"
+              style={{ borderBottom: "1px solid rgba(201,168,76,0.06)" }}>
+              <img src={url} alt="" className="w-6 h-6 object-contain rounded flex-shrink-0"
+                style={{ background: "rgba(245,240,235,0.9)" }} />
+              <span className="text-xs truncate" style={{ color: "#1a0a00" }}>{url.split("/").pop()}</span>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 const inputCls = "w-full px-3 py-2.5 rounded-xl text-sm outline-none transition-all";
 const inputSt  = { background: "#f8f5f0", border: "1.5px solid rgba(201,168,76,0.2)", color: "#1a0a00" };
 const labelCls = "text-[10px] font-black tracking-[0.22em] uppercase mb-1 block";
@@ -115,114 +384,60 @@ const labelCls = "text-[10px] font-black tracking-[0.22em] uppercase mb-1 block"
 // ─── Main page ────────────────────────────────────────────────────────────────
 
 export default function HomepageAdminPage() {
-  const [cfg, setCfg] = useState<HomepageConfig>(DEFAULT_CONFIG);
+  const [cfg, setCfg]             = useState<HomepageConfig>(DEFAULT_CONFIG);
   const [allProducts, setAllProducts] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [saved, setSaved] = useState(false);
-  const [error, setError] = useState("");
+  const [imageSuggestions, setImageSuggestions] = useState<string[]>([]);
+  const [loading, setLoading]     = useState(true);
+  const [saving, setSaving]       = useState(false);
+  const [saved, setSaved]         = useState(false);
+  const [error, setError]         = useState("");
 
-  // Load config and products from DB on mount
   useEffect(() => {
     async function loadData() {
       setLoading(true);
       try {
         const [config, products] = await Promise.all([
           getHomepageConfig(),
-          getAllProductsAction()
+          getAllProductsAction(),
         ]);
-        
-        console.log("Loaded products:", products);
-        console.log("Products count:", products?.length);
-        
-        if (config) {
-          setCfg(config);
-        }
-        if (products && products.length > 0) {
-          setAllProducts(products);
-        } else {
-          console.log("No products returned from server action");
-        }
+        if (config) setCfg(config);
+        if (products?.length) setAllProducts(products);
       } catch (err) {
-        console.error("Failed to load data:", err);
         setError("Failed to load configuration");
       } finally {
         setLoading(false);
       }
+
+      fetch("/api/images/perfume")
+        .then(res => res.json())
+        .then(data => setImageSuggestions(data))
+        .catch(() => {});
     }
     loadData();
   }, []);
 
   const save = async () => {
-    setSaving(true);
-    setError("");
+    setSaving(true); setError("");
     try {
       const result = await saveHomepageConfig(cfg);
-      if (result.success) {
-        setSaved(true);
-        setTimeout(() => setSaved(false), 2500);
-      } else {
-        setError(result.error || "Failed to save configuration");
-      }
-    } catch (err) {
-      console.error("Save error:", err);
-      setError("An error occurred while saving");
-    } finally {
-      setSaving(false);
-    }
+      if (result.success) { setSaved(true); setTimeout(() => setSaved(false), 2500); }
+      else setError(result.error || "Failed to save configuration");
+    } catch { setError("An error occurred while saving"); }
+    finally { setSaving(false); }
   };
 
-  const toggleSection = (key: string) =>
-    setCfg(c => ({ ...c, sections: c.sections.map(s => s.key === key ? { ...s, enabled: !s.enabled } : s) }));
-
-  const toggleTrending = (id: string) =>
-    setCfg(c => ({
-      ...c,
-      trendingProducts: c.trendingProducts.includes(id)
-        ? c.trendingProducts.filter(x => x !== id)
-        : [...c.trendingProducts, id],
-    }));
-
-  const toggleArrival = (id: string) =>
-    setCfg(c => ({
-      ...c,
-      newArrivalProducts: c.newArrivalProducts.includes(id)
-        ? c.newArrivalProducts.filter(x => x !== id)
-        : [...c.newArrivalProducts, id],
-    }));
-
-  const updateSet = (id: number, key: string, val: string | boolean) =>
-    setCfg(c => ({ ...c, featuredSets: c.featuredSets.map(s => s.id === id ? { ...s, [key]: val } : s) }));
-
-  const addSet = () =>
-    setCfg(c => ({
-      ...c,
-      featuredSets: [...c.featuredSets, {
-        id: Date.now(), name: "", brand: "", tagline: "", imagePreview: "", videoName: "", videoPath: "",
-        imageLeft: true, bg: "linear-gradient(135deg, #1a0f00 0%, #0d0800 100%)", href: "",
-      }],
-    }));
-
-  const removeSet = (id: number) =>
-    setCfg(c => ({ ...c, featuredSets: c.featuredSets.filter(s => s.id !== id) }));
-
-  const addBrand = () =>
-    setCfg(c => ({ ...c, brands: [...c.brands, { id: Date.now(), name: "", image: "", href: "" }] }));
-
-  const updateBrand = (id: number, key: string, val: string) =>
-    setCfg(c => ({ ...c, brands: c.brands.map(b => b.id === id ? { ...b, [key]: val } : b) }));
-
-  const removeBrand = (id: number) =>
-    setCfg(c => ({ ...c, brands: c.brands.filter(b => b.id !== id) }));
-
-  const addReview = () =>
-    setCfg(c => ({ ...c, reviews: [...c.reviews, { id: Date.now(), name: "", title: "", body: "", rating: 5 }] }));
-
-  const updateReview = (id: number, key: string, val: string | number) =>
-    setCfg(c => ({ ...c, reviews: c.reviews.map(r => r.id === id ? { ...r, [key]: val } : r) }));
-
-  const removeReview = (id: number) =>
-    setCfg(c => ({ ...c, reviews: c.reviews.filter(r => r.id !== id) }));
+  const toggleSection  = (key: string) => setCfg(c => ({ ...c, sections: c.sections.map(s => s.key === key ? { ...s, enabled: !s.enabled } : s) }));
+  const toggleTrending = (id: string)  => setCfg(c => ({ ...c, trendingProducts: c.trendingProducts.includes(id) ? c.trendingProducts.filter(x => x !== id) : [...c.trendingProducts, id] }));
+  const toggleArrival  = (id: string)  => setCfg(c => ({ ...c, newArrivalProducts: c.newArrivalProducts.includes(id) ? c.newArrivalProducts.filter(x => x !== id) : [...c.newArrivalProducts, id] }));
+  const updateSet  = (id: number, key: string, val: string | boolean) => setCfg(c => ({ ...c, featuredSets: c.featuredSets.map(s => s.id === id ? { ...s, [key]: val } : s) }));
+  const addSet     = () => setCfg(c => ({ ...c, featuredSets: [...c.featuredSets, { id: Date.now(), name: "", brand: "", tagline: "", imagePreview: "", videoName: "", videoPath: "", imageLeft: true, bg: "linear-gradient(135deg, #1a0f00 0%, #0d0800 100%)", href: "" }] }));
+  const removeSet  = (id: number) => setCfg(c => ({ ...c, featuredSets: c.featuredSets.filter(s => s.id !== id) }));
+  const addBrand   = () => setCfg(c => ({ ...c, brands: [...c.brands, { id: Date.now(), name: "", image: "", href: "" }] }));
+  const updateBrand = (id: number, key: string, val: string) => setCfg(c => ({ ...c, brands: c.brands.map(b => b.id === id ? { ...b, [key]: val } : b) }));
+  const removeBrand = (id: number) => setCfg(c => ({ ...c, brands: c.brands.filter(b => b.id !== id) }));
+  const addReview   = () => setCfg(c => ({ ...c, reviews: [...c.reviews, { id: Date.now(), name: "", title: "", body: "", rating: 5 }] }));
+  const updateReview = (id: number, key: string, val: string | number) => setCfg(c => ({ ...c, reviews: c.reviews.map(r => r.id === id ? { ...r, [key]: val } : r) }));
+  const removeReview = (id: number) => setCfg(c => ({ ...c, reviews: c.reviews.filter(r => r.id !== id) }));
 
   if (loading) {
     return (
@@ -241,38 +456,20 @@ export default function HomepageAdminPage() {
       {/* Page header */}
       <div className="flex items-start sm:items-center justify-between gap-4 flex-wrap">
         <div>
-          <h1 className="text-xl md:text-2xl font-black tracking-[0.1em] uppercase" style={{ fontFamily: "Georgia, serif", color: "#1a0a00" }}>
-            Homepage
-          </h1>
+          <h1 className="text-xl md:text-2xl font-black tracking-[0.1em] uppercase" style={{ fontFamily: "Georgia, serif", color: "#1a0a00" }}>Homepage</h1>
           <p className="text-xs mt-1" style={{ color: "#a89070" }}>Manage every section of your homepage</p>
         </div>
-        
         {error && (
-          <div className="text-xs px-3 py-2 rounded-lg" style={{ background: "rgba(201,68,68,0.1)", color: "#c94444" }}>
-            {error}
-          </div>
+          <div className="text-xs px-3 py-2 rounded-lg" style={{ background: "rgba(201,68,68,0.1)", color: "#c94444" }}>{error}</div>
         )}
-        
-        <button 
-          onClick={save} 
-          disabled={saving}
+        <button onClick={save} disabled={saving}
           className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-black tracking-widest uppercase transition-all hover:scale-105 flex-shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
-          style={{ 
-            background: saved ? "linear-gradient(135deg,#2d8a4e,#1a5c30)" : "linear-gradient(135deg,#1a0f00,#0d0800)", 
-            border: `1.5px solid ${saved ? "#2d8a4e" : "#C9A84C"}`, 
-            color: saved ? "#fff" : "#C9A84C" 
-          }}>
-          {saving ? (
-            <><div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" /> Saving...</>
-          ) : saved ? (
-            <><Check size={13} /> Saved!</>
-          ) : (
-            "Save Changes"
-          )}
+          style={{ background: saved ? "linear-gradient(135deg,#2d8a4e,#1a5c30)" : "linear-gradient(135deg,#1a0f00,#0d0800)", border: `1.5px solid ${saved ? "#2d8a4e" : "#C9A84C"}`, color: saved ? "#fff" : "#C9A84C" }}>
+          {saving ? <><div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" /> Saving...</> : saved ? <><Check size={13} /> Saved!</> : "Save Changes"}
         </button>
       </div>
 
-      {/* ── 1. Sections ON/OFF ─────────────────────────────────────────────── */}
+      {/* ── 1. Section Visibility ──────────────────────────────────────────── */}
       <SectionCard title="Section Visibility" defaultOpen>
         <div className="flex flex-col gap-3">
           {cfg.sections.map(s => (
@@ -299,64 +496,101 @@ export default function HomepageAdminPage() {
       </SectionCard>
 
       {/* ── 3. Hero ───────────────────────────────────────────────────────── */}
-{/* ── 3. Hero ───────────────────────────────────────────────────────── */}
-<SectionCard title="Hero Section">
-  <div className="space-y-4">
-    {/* Hero Type Selection */}
-    <div className="flex gap-4">
-      <button
-        onClick={() => setCfg(c => ({ ...c, heroType: "image" }))}
-        className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${
-          cfg.heroType === "image" 
-            ? "bg-[#C9A84C] text-[#1a0800]" 
-            : "bg-gray-100 text-[#8B6914]"
-        }`}
-      >
-        Image Hero
-      </button>
-      <button
-        onClick={() => setCfg(c => ({ ...c, heroType: "video" }))}
-        className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${
-          cfg.heroType === "video" 
-            ? "bg-[#C9A84C] text-[#1a0800]" 
-            : "bg-gray-100 text-[#8B6914]"
-        }`}
-      >
-        Video Hero
-      </button>
-    </div>
-    
-    {cfg.heroType === "image" ? (
-      <>
-        <p className="text-xs" style={{ color: "#a89070" }}>Upload or set the hero banner image.</p>
-        <ImageUploadBox 
-          value={cfg.heroImage} 
-          onChange={v => setCfg(c => ({ ...c, heroImage: v }))} 
-          label="Upload Hero Image" 
-        />
-        {cfg.heroImage && (
-          <div className="mt-4 rounded-xl overflow-hidden" style={{ maxHeight: "200px" }}>
-            <img src={cfg.heroImage} alt="hero preview" className="w-full object-cover" />
+      <SectionCard title="Hero Section">
+        <div className="space-y-4">
+          {/* Type toggle */}
+          <div className="flex gap-4">
+            {(["image", "video"] as const).map(t => (
+              <button key={t} onClick={() => setCfg(c => ({ ...c, heroType: t }))}
+                className="px-4 py-2 rounded-lg text-xs font-bold transition-all"
+                style={{ background: cfg.heroType === t ? "#C9A84C" : "#f8f5f0", color: cfg.heroType === t ? "#1a0800" : "#8B6914", border: `1px solid ${cfg.heroType === t ? "#C9A84C" : "rgba(201,168,76,0.2)"}` }}>
+                {t === "image" ? "Image Hero" : "Video Hero"}
+              </button>
+            ))}
           </div>
-        )}
-      </>
-    ) : (
-      <>
-        <p className="text-xs" style={{ color: "#a89070" }}>Upload or set the hero banner video.</p>
-        <VideoPathInput 
-          value={cfg.heroVideo || ""} 
-          onChange={(v) => setCfg(c => ({ ...c, heroVideo: v }))}
-          label="Hero Video Path"
-        />
-        {cfg.heroVideo && (
-          <div className="mt-4 rounded-xl overflow-hidden" style={{ maxHeight: "200px" }}>
-            <video src={cfg.heroVideo} className="w-full object-cover" controls />
-          </div>
-        )}
-      </>
-    )}
-  </div>
-</SectionCard>
+
+          {cfg.heroType === "image" ? (
+            <>
+              <p className="text-xs" style={{ color: "#a89070" }}>Upload, paste a URL, or search existing images for the hero banner.</p>
+
+              {/* ── Full DualImageInput for hero ── */}
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                {/* Preview */}
+                <div className="w-20 h-20 rounded-xl overflow-hidden flex-shrink-0 flex items-center justify-center"
+                  style={{ background: "rgba(245,240,235,0.9)", border: "1.5px solid rgba(201,168,76,0.25)" }}>
+                  {cfg.heroImage
+                    ? <img src={cfg.heroImage} alt="hero preview" className="w-full h-full object-contain p-1.5" />
+                    : <Upload size={20} color="rgba(201,168,76,0.4)" />}
+                </div>
+
+                <div className="flex flex-col gap-2 flex-1 w-full">
+                  {/* Upload */}
+                  <label className="cursor-pointer flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold tracking-wide transition-all hover:scale-105 self-start"
+                    style={{ background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.3)", color: "#8B6914" }}>
+                    <Upload size={13} /> Upload Hero Image
+                    <input type="file" accept="image/*" className="hidden"
+                      onChange={e => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        const reader = new FileReader();
+                        reader.onload = () => setCfg(c => ({ ...c, heroImage: reader.result as string }));
+                        reader.readAsDataURL(file);
+                      }} />
+                  </label>
+
+                  {/* URL / path input */}
+                  <input
+                    type="text"
+                    placeholder="Or paste image URL / path (e.g. /images/hero.jpg)..."
+                    value={cfg.heroImage.startsWith("data:") ? "" : cfg.heroImage}
+                    onChange={e => setCfg(c => ({ ...c, heroImage: e.target.value }))}
+                    className="w-full px-3 py-2 rounded-lg text-xs outline-none"
+                    style={{ background: "#f8f5f0", border: "1.5px solid rgba(201,168,76,0.2)", color: "#1a0a00" }}
+                    onFocus={e => (e.target.style.border = "1.5px solid #C9A84C")}
+                    onBlur={e => (e.target.style.border = "1.5px solid rgba(201,168,76,0.2)")}
+                  />
+
+                  {/* Search suggestions */}
+                  {imageSuggestions.length > 0 && (() => {
+                    // Local state via a small inner component to avoid hooks-in-render issues
+                    return (
+                      <HeroImageSearch
+                        suggestions={imageSuggestions}
+                        onSelect={v => setCfg(c => ({ ...c, heroImage: v }))}
+                      />
+                    );
+                  })()}
+
+                  {cfg.heroImage && (
+                    <button onClick={() => setCfg(c => ({ ...c, heroImage: "" }))}
+                      className="flex items-center gap-1.5 text-[10px] self-start transition-opacity hover:opacity-70"
+                      style={{ color: "#c94444" }}>
+                      <X size={10} /> Clear image
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* Large preview */}
+              {cfg.heroImage && (
+                <div className="mt-4 rounded-xl overflow-hidden" style={{ maxHeight: 200 }}>
+                  <img src={cfg.heroImage} alt="hero preview" className="w-full object-cover" />
+                </div>
+              )}
+            </>
+          ) : (
+            <>
+              <p className="text-xs" style={{ color: "#a89070" }}>Upload or set the hero banner video.</p>
+              <VideoPathInput value={cfg.heroVideo || ""} onChange={v => setCfg(c => ({ ...c, heroVideo: v }))} label="Hero Video Path" />
+              {cfg.heroVideo && (
+                <div className="mt-4 rounded-xl overflow-hidden" style={{ maxHeight: 200 }}>
+                  <video src={cfg.heroVideo} className="w-full object-cover" controls />
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      </SectionCard>
 
       {/* ── 4. Trending ───────────────────────────────────────────────────── */}
       <SectionCard title="Trending Now — Product Selection">
@@ -406,54 +640,42 @@ export default function HomepageAdminPage() {
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className={labelCls} style={{ color: "#8B6914" }}>Product Name</label>
-                  <input type="text" value={set.name} className={inputCls} style={inputSt}
-                    onChange={e => updateSet(set.id, "name", e.target.value)}
-                    onFocus={e => (e.target.style.border = "1.5px solid #C9A84C")}
-                    onBlur={e => (e.target.style.border = "1.5px solid rgba(201,168,76,0.2)")} />
+                {[
+                  { key: "name",    label: "Product Name" },
+                  { key: "brand",   label: "Brand"        },
+                  { key: "tagline", label: "Tagline"       },
+                  { key: "bg",      label: "Background Gradient" },
+                ].map(f => (
+                  <div key={f.key}>
+                    <label className={labelCls} style={{ color: "#8B6914" }}>{f.label}</label>
+                    <input type="text" value={(set as any)[f.key]} className={inputCls} style={inputSt}
+                      onChange={e => updateSet(set.id, f.key, e.target.value)}
+                      onFocus={e => (e.target.style.border = "1.5px solid #C9A84C")}
+                      onBlur={e => (e.target.style.border = "1.5px solid rgba(201,168,76,0.2)")} />
+                  </div>
+                ))}
+
+                {/* Product Link */}
+                <div className="sm:col-span-2">
+                  <ProductLinkPicker
+                    value={set.href}
+                    onChange={v => updateSet(set.id, "href", v)}
+                    allProducts={allProducts}
+                  />
                 </div>
-                <div>
-                  <label className={labelCls} style={{ color: "#8B6914" }}>Brand</label>
-                  <input type="text" value={set.brand} className={inputCls} style={inputSt}
-                    onChange={e => updateSet(set.id, "brand", e.target.value)}
-                    onFocus={e => (e.target.style.border = "1.5px solid #C9A84C")}
-                    onBlur={e => (e.target.style.border = "1.5px solid rgba(201,168,76,0.2)")} />
-                </div>
-                <div>
-                  <label className={labelCls} style={{ color: "#8B6914" }}>Tagline</label>
-                  <input type="text" value={set.tagline} className={inputCls} style={inputSt}
-                    onChange={e => updateSet(set.id, "tagline", e.target.value)}
-                    onFocus={e => (e.target.style.border = "1.5px solid #C9A84C")}
-                    onBlur={e => (e.target.style.border = "1.5px solid rgba(201,168,76,0.2)")} />
-                </div>
-                <div>
-                  <label className={labelCls} style={{ color: "#8B6914" }}>Product Link (href)</label>
-                  <input type="text" value={set.href} placeholder="/products/your-product-id" className={inputCls} style={inputSt}
-                    onChange={e => updateSet(set.id, "href", e.target.value)}
-                    onFocus={e => (e.target.style.border = "1.5px solid #C9A84C")}
-                    onBlur={e => (e.target.style.border = "1.5px solid rgba(201,168,76,0.2)")} />
-                </div>
-                <div>
-                <VideoPathInput 
-                  value={set.videoPath} 
-                  onChange={(v) => updateSet(set.id, "videoPath", v)}
-                  label="Video Path"
-                />
-                </div>
-                <div>
-                  <label className={labelCls} style={{ color: "#8B6914" }}>Background Gradient</label>
-                  <input type="text" value={set.bg} className={inputCls} style={inputSt}
-                    onChange={e => updateSet(set.id, "bg", e.target.value)}
-                    onFocus={e => (e.target.style.border = "1.5px solid #C9A84C")}
-                    onBlur={e => (e.target.style.border = "1.5px solid rgba(201,168,76,0.2)")} />
+
+                <div className="sm:col-span-2">
+                  <VideoPathInput value={set.videoPath} onChange={v => updateSet(set.id, "videoPath", v)} label="Video Path" />
                 </div>
               </div>
 
-              <div>
-                <label className={labelCls} style={{ color: "#8B6914" }}>Product Image</label>
-                <ImageUploadBox value={set.imagePreview} onChange={v => updateSet(set.id, "imagePreview", v)} />
-              </div>
+              {/* ── Replaced ImageUploadBox with DualImageInput ── */}
+              <DualImageInput
+                value={set.imagePreview}
+                onChange={v => updateSet(set.id, "imagePreview", v)}
+                imageSuggestions={imageSuggestions}
+                label="Product Image"
+              />
 
               <div className="flex items-center justify-between px-4 py-3 rounded-xl flex-wrap gap-3"
                 style={{ background: "#fff", border: "1px solid rgba(201,168,76,0.15)" }}>
@@ -517,60 +739,55 @@ export default function HomepageAdminPage() {
       </SectionCard>
 
       {/* ── 7. Brands ─────────────────────────────────────────────────────── */}
-{/* ── 7. Brands ─────────────────────────────────────────────────────── */}
-<SectionCard title="Top Brands">
-  <p className="text-xs mb-4" style={{ color: "#a89070" }}>Add, edit or remove brand logos shown in the auto-scrolling brands row.</p>
-  <div className="flex flex-col gap-3">
-    {cfg.brands.map(b => (
-      <div key={b.id} className="flex flex-col gap-3 px-4 py-3 rounded-xl"
-        style={{ background: "#f8f5f0", border: "1px solid rgba(201,168,76,0.15)" }}>
-        
-        {/* Logo preview and upload with auto-suggest */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
-          <div className="w-12 h-10 rounded-lg overflow-hidden flex-shrink-0 flex items-center justify-center"
-            style={{ background: "#fff", border: "1px solid rgba(201,168,76,0.2)" }}>
-            {b.image ? <img src={b.image} alt={b.name} className="w-full h-full object-contain p-1" /> : <Upload size={14} color="rgba(201,168,76,0.3)" />}
-          </div>
-          
-          {/* Use ImageUploadBox for brand logos */}
-          <div className="flex-1 w-full">
-            <ImageUploadBox 
-              value={b.image} 
-              onChange={(v) => updateBrand(b.id, "image", v)}
-              label="Brand Logo"
-            />
-          </div>
-        </div>
-        
-        {/* Brand name and href inputs */}
-        <div className="flex flex-col sm:flex-row gap-2">
-          <input type="text" value={b.name} placeholder="Brand name"
-            className="flex-1 px-3 py-2 rounded-lg text-xs outline-none min-w-0"
-            style={{ background: "#fff", border: "1px solid rgba(201,168,76,0.2)", color: "#1a0a00" }}
-            onChange={e => updateBrand(b.id, "name", e.target.value)} />
-          <input type="text" value={b.href} placeholder="/brands/slug"
-            className="flex-1 px-3 py-2 rounded-lg text-xs outline-none min-w-0"
-            style={{ background: "#fff", border: "1px solid rgba(201,168,76,0.2)", color: "#1a0a00" }}
-            onChange={e => updateBrand(b.id, "href", e.target.value)} />
-        </div>
-        
-        {/* Delete button */}
-        <div className="flex justify-end">
-          <button onClick={() => removeBrand(b.id)} className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0"
-            style={{ background: "rgba(201,26,26,0.1)" }}>
-            <Trash2 size={12} color="#c94444" />
+      <SectionCard title="Top Brands">
+        <p className="text-xs mb-4" style={{ color: "#a89070" }}>Add, edit or remove brand logos shown in the auto-scrolling brands row.</p>
+        <div className="flex flex-col gap-3">
+          {cfg.brands.map(b => (
+            <div key={b.id} className="flex flex-col gap-3 px-4 py-3 rounded-xl"
+              style={{ background: "#f8f5f0", border: "1px solid rgba(201,168,76,0.15)" }}>
+
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-10 rounded-lg overflow-hidden flex-shrink-0 flex items-center justify-center"
+                  style={{ background: "#fff", border: "1px solid rgba(201,168,76,0.2)" }}>
+                  {b.image
+                    ? <img src={b.image} alt={b.name} className="w-full h-full object-contain p-1" />
+                    : <Upload size={14} color="rgba(201,168,76,0.3)" />}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <label className={labelCls} style={{ color: "#8B6914" }}>Logo Image</label>
+                  <ImageSuggestionInput
+                    value={b.image}
+                    onChange={v => updateBrand(b.id, "image", v)}
+                    suggestions={imageSuggestions}
+                    placeholder="Search images or paste URL..."
+                  />
+                </div>
+                <button onClick={() => removeBrand(b.id)} className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 self-end"
+                  style={{ background: "rgba(201,26,26,0.1)" }}>
+                  <Trash2 size={12} color="#c94444" />
+                </button>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-2">
+                <input type="text" value={b.name} placeholder="Brand name"
+                  className="flex-1 px-3 py-2 rounded-lg text-xs outline-none min-w-0"
+                  style={{ background: "#fff", border: "1px solid rgba(201,168,76,0.2)", color: "#1a0a00" }}
+                  onChange={e => updateBrand(b.id, "name", e.target.value)} />
+                <input type="text" value={b.href} placeholder="/brands/slug"
+                  className="flex-1 px-3 py-2 rounded-lg text-xs outline-none min-w-0"
+                  style={{ background: "#fff", border: "1px solid rgba(201,168,76,0.2)", color: "#1a0a00" }}
+                  onChange={e => updateBrand(b.id, "href", e.target.value)} />
+              </div>
+            </div>
+          ))}
+
+          <button onClick={addBrand}
+            className="flex items-center justify-center gap-2 py-3 rounded-xl text-xs font-bold tracking-widest uppercase transition-all hover:scale-105"
+            style={{ background: "rgba(201,168,76,0.08)", border: "1.5px dashed rgba(201,168,76,0.4)", color: "#8B6914" }}>
+            <Plus size={14} /> Add Brand
           </button>
         </div>
-      </div>
-    ))}
-    
-    <button onClick={addBrand}
-      className="flex items-center justify-center gap-2 py-3 rounded-xl text-xs font-bold tracking-widest uppercase transition-all hover:scale-105"
-      style={{ background: "rgba(201,168,76,0.08)", border: "1.5px dashed rgba(201,168,76,0.4)", color: "#8B6914" }}>
-      <Plus size={14} /> Add Brand
-    </button>
-  </div>
-</SectionCard>
+      </SectionCard>
 
       {/* ── 8. Reviews ────────────────────────────────────────────────────── */}
       <SectionCard title="Customer Reviews">
@@ -615,6 +832,70 @@ export default function HomepageAdminPage() {
         </div>
       </SectionCard>
 
+    </div>
+  );
+}
+
+// ─── Hero Image Search ────────────────────────────────────────────────────────
+// Extracted as a proper component so hooks are valid inside the hero section render
+
+function HeroImageSearch({
+  suggestions,
+  onSelect,
+}: {
+  suggestions: string[];
+  onSelect: (v: string) => void;
+}) {
+  const [query, setQuery] = useState("");
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  const filtered = suggestions.filter(s =>
+    s.toLowerCase().includes(query.toLowerCase())
+  );
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  return (
+    <div ref={ref} className="relative w-full">
+      <div className="flex items-center gap-2 px-3 py-2 rounded-lg"
+        style={{ background: "#f8f5f0", border: "1.5px solid rgba(201,168,76,0.2)" }}>
+        <Search size={12} color="#8B6914" className="flex-shrink-0" />
+        <input
+          type="text"
+          placeholder="Search existing images..."
+          value={query}
+          onChange={e => { setQuery(e.target.value); setOpen(true); }}
+          onFocus={() => setOpen(true)}
+          className="flex-1 text-xs bg-transparent outline-none min-w-0"
+          style={{ color: "#1a0a00" }}
+        />
+        {query && (
+          <button onClick={() => { setQuery(""); setOpen(false); }}>
+            <X size={11} color="#a89070" />
+          </button>
+        )}
+      </div>
+      {open && filtered.length > 0 && (
+        <div className="absolute z-20 mt-1 w-full rounded-xl overflow-hidden shadow-lg"
+          style={{ background: "#fff", border: "1px solid rgba(201,168,76,0.2)", maxHeight: 200, overflowY: "auto" }}>
+          {filtered.map((url, i) => (
+            <button key={i} onClick={() => { onSelect(url); setQuery(""); setOpen(false); }}
+              className="flex items-center gap-2 w-full px-3 py-2 text-xs hover:bg-amber-50 transition-colors text-left"
+              style={{ color: "#1a0a00", borderBottom: "1px solid rgba(201,168,76,0.06)" }}>
+              <img src={url} alt="" className="w-6 h-6 object-contain rounded flex-shrink-0"
+                style={{ background: "rgba(245,240,235,0.9)" }} />
+              <span className="truncate">{url.split("/").pop()}</span>
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

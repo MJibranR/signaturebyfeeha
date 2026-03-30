@@ -1,5 +1,6 @@
 "use client";
 export const dynamic = "force-dynamic";
+
 import { useState, useEffect } from "react";
 import { Search, Plus, Pencil, Trash2, X, Check, Upload } from "lucide-react";
 import {
@@ -45,7 +46,7 @@ const FIELDS = [
   { key: "baseNotes",   label: "Base Notes",              type: "text",   required: true },
 ];
 
-const CATEGORIES = ["men", "women", "unisex",];
+const CATEGORIES = ["men", "women", "unisex"];
 
 const statusStyle: Record<string, { bg: string; color: string }> = {
   true:  { bg: "rgba(45,138,78,0.12)",  color: "#2d8a4e" },
@@ -54,17 +55,24 @@ const statusStyle: Record<string, { bg: string; color: string }> = {
 
 // ─── Product Form Modal ───────────────────────────────────────────────────────
 function ProductForm({
-  title, initial, onSave, onClose,
+  title, initial, onSave, onClose, imageSuggestions,
 }: {
   title: string;
   initial: Product;
   onSave: (p: Product) => Promise<void>;
   onClose: () => void;
+  imageSuggestions: string[];
 }) {
   const [form, setForm] = useState(initial);
   const [imagePreview, setImagePreview] = useState(initial.image);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState(false);
+  const [imageSearch, setImageSearch] = useState("");
+  const [showSuggestions, setShowSuggestions] = useState(false);
+
+  const filteredSuggestions = imageSuggestions.filter(s =>
+    s.toLowerCase().includes(imageSearch.toLowerCase())
+  );
 
   const validate = () => {
     const e: Record<string, string> = {};
@@ -89,6 +97,13 @@ function ProductForm({
       setForm(f => ({ ...f, image: src }));
     };
     reader.readAsDataURL(file);
+  };
+
+  const handleSelectSuggestion = (url: string) => {
+    setForm(f => ({ ...f, image: url }));
+    setImagePreview(url);
+    setImageSearch("");
+    setShowSuggestions(false);
   };
 
   const handleSubmit = async () => {
@@ -137,11 +152,44 @@ function ProductForm({
                   <Upload size={13} /> Upload Image
                   <input type="file" accept="image/*" onChange={handleImage} className="hidden" />
                 </label>
-                <input type="text" placeholder="Or paste image URL..."
+                <input
+                  type="text"
+                  placeholder="Or paste image URL..."
                   value={form.image.startsWith("data:") ? "" : form.image}
-                  onChange={e => { setForm(f => ({ ...f, image: e.target.value })); setImagePreview(e.target.value); }}
+                  onChange={e => {
+                    setForm(f => ({ ...f, image: e.target.value }));
+                    setImagePreview(e.target.value);
+                  }}
                   className="px-3 py-2 rounded-lg text-xs outline-none w-full"
-                  style={{ background: "#f8f5f0", border: "1.5px solid rgba(201,168,76,0.2)", color: "#1a0a00" }} />
+                  style={{ background: "#f8f5f0", border: "1.5px solid rgba(201,168,76,0.2)", color: "#1a0a00" }}
+                />
+                {/* Image suggestions search */}
+                {imageSuggestions.length > 0 && (
+                  <div className="relative w-full">
+                    <input
+                      type="text"
+                      placeholder="Search existing images..."
+                      value={imageSearch}
+                      onChange={e => { setImageSearch(e.target.value); setShowSuggestions(true); }}
+                      onFocus={() => setShowSuggestions(true)}
+                      className="px-3 py-2 rounded-lg text-xs outline-none w-full"
+                      style={{ background: "#f8f5f0", border: "1.5px solid rgba(201,168,76,0.2)", color: "#1a0a00" }}
+                    />
+                    {showSuggestions && filteredSuggestions.length > 0 && (
+                      <div className="absolute z-10 mt-1 w-full rounded-xl overflow-hidden shadow-lg"
+                        style={{ background: "#fff", border: "1px solid rgba(201,168,76,0.2)", maxHeight: 200, overflowY: "auto" }}>
+                        {filteredSuggestions.map((url, i) => (
+                          <button key={i} onClick={() => handleSelectSuggestion(url)}
+                            className="flex items-center gap-2 w-full px-3 py-2 text-xs hover:bg-amber-50 transition-colors text-left"
+                            style={{ color: "#1a0a00" }}>
+                            <img src={url} alt="" className="w-6 h-6 object-contain rounded" />
+                            <span className="truncate">{url.split("/").pop()}</span>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -230,13 +278,17 @@ export default function AdminProductsPage() {
   const [editing, setEditing]         = useState<Product | null>(null);
   const [showAdd, setShowAdd]         = useState(false);
   const [deleteId, setDeleteId]       = useState<string | null>(null);
+  const [imageSuggestions, setImageSuggestions] = useState<string[]>([]);
 
-  // Load products from DB on mount
   useEffect(() => {
     getProducts().then(data => {
       setProductList(data as Product[]);
       setLoading(false);
     });
+
+    fetch("/api/images/perfume")
+      .then(res => res.json())
+      .then(data => setImageSuggestions(data));
   }, []);
 
   const filtered = productList.filter(p =>
@@ -357,10 +409,22 @@ export default function AdminProductsPage() {
       </div>
 
       {showAdd && (
-        <ProductForm title="Add Product" initial={{ ...EMPTY }} onSave={handleAdd} onClose={() => setShowAdd(false)} />
+        <ProductForm
+          title="Add Product"
+          initial={{ ...EMPTY }}
+          onSave={handleAdd}
+          onClose={() => setShowAdd(false)}
+          imageSuggestions={imageSuggestions}
+        />
       )}
       {editing && (
-        <ProductForm title="Save Changes" initial={editing} onSave={handleSave} onClose={() => setEditing(null)} />
+        <ProductForm
+          title="Save Changes"
+          initial={editing}
+          onSave={handleSave}
+          onClose={() => setEditing(null)}
+          imageSuggestions={imageSuggestions}
+        />
       )}
 
       {/* Delete confirm */}
